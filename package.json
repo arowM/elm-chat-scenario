@@ -1,0 +1,43 @@
+{
+  "name": "elm-chat-ui",
+  "description": "Chat like UI written in Elm",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": "Kadzuya Okamoto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arowM/elm-chat-ui"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --hot",
+    "build": "rimraf dist && webpack"
+  },
+  "devDependencies": {
+    "stylelint": "^7.3.1",
+    "stylelint-config-standard": "^13.0.2"
+  },
+  "dependencies": {
+    "autoprefixer": "^6.5.0",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.25.0",
+    "elm": "^0.17.1",
+    "elm-hot-loader": "^0.3.4",
+    "elm-webpack-loader": "^3.0.6",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.22.0",
+    "modularscale-sass": "^2.1.1",
+    "node-sass": "^3.10.1",
+    "postcss-flexbugs-fixes": "~2.0.0",
+    "postcss-loader": "^0.13.0",
+    "postcss-reporter": "^1.4.1",
+    "resolve-url-loader": "^1.6.0",
+    "rimraf": "^2.5.4",
+    "sass-loader": "^4.0.2",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.1",
+    "webpack-merge": "^0.14.1"
+  }
+}
