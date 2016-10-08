@@ -2,10 +2,17 @@ module Scenario exposing
   ( Scenario
   , TalkConfig
   , ChoiceConfig
+  , InputConfig
   , succeed
   , andThen
+  , map
   , talk
   , choice
+  , talkConfig
+  , tagInput
+  , tagTextArea
+  , tagSelect
+  , tagCustom
   )
 {-| Type safe scenario model for chat like UI.
 
@@ -14,15 +21,26 @@ module Scenario exposing
 @docs Scenario
 @docs TalkConfig
 @docs ChoiceConfig
+@docs InputConfig
 
 # Common functions
 
 @docs succeed
 @docs andThen
-@talk
-@choice
+@docs map
 
-# Functions to construct configuration
+# Functions to construct scenario
+
+@docs talk
+@docs choice
+
+# Functions to construct tags
+
+@docs talkConfig
+@docs tagInput
+@docs tagTextArea
+@docs tagSelect
+@docs tagCustom
 
 -}
 
@@ -57,6 +75,10 @@ andThen s f =
 
     Pure a ->
       f a
+
+
+map : (a -> b) -> Scenario msg a -> Scenario msg b
+map f m = m `andThen` (succeed << f)
 
 
 talk : TalkConfig -> Scenario msg ()
@@ -123,9 +145,9 @@ type ChoiceConfig msg
 
 
 type alias InputArea msg =
-  { wrapperAttr : List (Attribute msg)
+  { attr : List (Attribute msg)
   , preContent : Html msg
-  , input : InputAreaConfig msg
+  , input : InputConfig msg
   , postContent : Html msg
   }
 
@@ -146,10 +168,10 @@ talkConfig s mf ps =
 
 
 
--- InputAreaConfig
+-- InputConfig
 
 
-type InputAreaConfig msg
+type InputConfig msg
   = TagInput (List (Attribute msg)) (List (Html msg))
   | TagTextArea (List (Attribute msg)) (List (Html msg))
   | TagSelect (List (Attribute msg)) (List (Html msg))
@@ -159,20 +181,20 @@ type InputAreaConfig msg
 -- HELPER FUNCTIONS
 
 
-tagInput : List (Attribute msg) -> List (Html msg) -> InputAreaConfig msg
+tagInput : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagInput = TagInput
 
 
-tagTextArea : List (Attribute msg) -> List (Html msg) -> InputAreaConfig msg
+tagTextArea : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagTextArea = TagTextArea
 
 
-tagSelect : List (Attribute msg) -> List (Html msg) -> InputAreaConfig msg
+tagSelect : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagSelect = TagSelect
 
 
 {-| Make input area with custom tag.
     The first argument is the custom tag name.
 -}
-tagCustom : String -> List (Attribute msg) -> List (Html msg) -> InputAreaConfig msg
+tagCustom : String -> List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagCustom = TagCustom
