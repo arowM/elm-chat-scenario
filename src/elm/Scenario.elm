@@ -1,14 +1,19 @@
 module Scenario exposing
   ( Scenario
   , TalkConfig
+  , TalkParagraph
   , ChoiceConfig
   , InputConfig
   , succeed
   , andThen
+  , andAlways
   , map
   , talk
-  , choice
   , talkConfig
+  , choice
+  , singleInput
+  , multiInput
+  , customInput
   , tagInput
   , tagTextArea
   , tagSelect
@@ -20,6 +25,7 @@ module Scenario exposing
 
 @docs Scenario
 @docs TalkConfig
+@docs TalkParagraph
 @docs ChoiceConfig
 @docs InputConfig
 
@@ -27,12 +33,19 @@ module Scenario exposing
 
 @docs succeed
 @docs andThen
+@docs andAlways
 @docs map
 
 # Functions to construct scenario
 
 @docs talk
 @docs choice
+
+# Functions to construct input area
+
+@docs singleInput
+@docs multiInput
+@docs customInput
 
 # Functions to construct tags
 
@@ -75,6 +88,12 @@ andThen s f =
 
     Pure a ->
       f a
+
+
+{-| Similar to `andThen`, but ignores previous state.
+-}
+andAlways : Scenario msg a -> Scenario msg b -> Scenario msg b
+andAlways s1 s2 = s1 `andThen` always s2
 
 
 map : (a -> b) -> Scenario msg a -> Scenario msg b
@@ -130,6 +149,7 @@ type ParagraphTag
   | TitleParagraph
   | SubParagraph
   | ImageParagraph
+  | CustomParagraph String
 
 
 type ChoiceConfig msg
@@ -156,6 +176,24 @@ type alias SubmitButton msg =
   { attr : List (Attribute msg)
   , label : String
   }
+
+
+singleInput : InputArea msg -> SubmitButton msg -> InputConfig msg
+singleInput input submit = SingleInput
+  { inputArea = input
+  , submitButton = submit
+  }
+
+
+multiInput : List (InputArea msg) -> SubmitButton msg -> InputConfig msg
+multiInput inputs submit = MultiInput
+  { inputAreas = inputs
+  , submitButton = submit
+  }
+
+
+customInput : String -> (Dict String Value) -> InputConfig msg
+customInput = CustomInput
 
 
 talkConfig : Speaker -> Maybe Feeling -> List TalkParagraph -> TalkConfig
@@ -198,3 +236,30 @@ tagSelect = TagSelect
 -}
 tagCustom : String -> List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagCustom = TagCustom
+
+
+sampleScenario :: Scenario msg ()
+sampleScenario =
+  talk <| talkConfig AI Nothing
+    [ { PlainParagraph
+      , "Test"
+      }
+    , { ImportantParagraph
+      , "Is this important question?"
+      }
+    ] `andAlways`
+  choice <| SingleInput
+
+choice : ChoiceConfig msg -> Scenario msg Value
+choice conf = Choice conf <| succeed
+
+type ChoiceConfig msg
+  = SingleInput
+    { inputArea : InputArea msg
+    , submitButton : SubmitButton msg
+    }
+  | MultiInput
+    { inputAreas : List (InputArea msg)
+    , submitButton : SubmitButton msg
+    }
+  | CustomInput String (Dict String Value)

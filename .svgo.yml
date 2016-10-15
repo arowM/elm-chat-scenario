@@ -1,0 +1,8 @@
+- convertPathData:
+    floatPrecision: 2
+- convertTransform:
+    floatPrecision: 2
+- cleanupNumericValues:
+    floatPrecision: 2
+- cleanupListOfValues:
+    floatPrecision: 2
