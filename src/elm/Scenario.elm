@@ -19,42 +19,42 @@ module Scenario exposing
   , tagSelect
   , tagCustom
   )
+
 {-| Type safe scenario model for chat like UI.
 
-# Types
+# Common Types
 
 @docs Scenario
-@docs TalkConfig
-@docs TalkParagraph
-@docs ChoiceConfig
-@docs InputConfig
 
-# Common functions
-
-@docs succeed
-@docs andThen
-@docs andAlways
-@docs map
-
-# Functions to construct scenario
+# Dominant functions to construct scenario
 
 @docs talk
 @docs choice
+@docs andThen
+@docs andAlways
 
-# Functions to construct input area
+# Types and functions to construct talk script
 
-@docs singleInput
-@docs multiInput
-@docs customInput
-
-# Functions to construct tags
-
+@docs TalkConfig
+@docs TalkParagraph
 @docs talkConfig
 @docs tagInput
 @docs tagTextArea
 @docs tagSelect
 @docs tagCustom
 
+# Functions to construct input area
+
+@docs ChoiceConfig
+@docs InputConfig
+@docs singleInput
+@docs multiInput
+@docs customInput
+
+# Rarely used but important functions
+
+@docs succeed
+@docs map
 -}
 
 
@@ -71,6 +71,8 @@ type Scenario msg a
   | Pure a
 
 
+{-| Construct scenario with any state.
+-}
 succeed : a -> Scenario msg a
 succeed = Pure
 
@@ -96,22 +98,30 @@ andAlways : Scenario msg a -> Scenario msg b -> Scenario msg b
 andAlways s1 s2 = s1 `andThen` always s2
 
 
+{-| Convert scenario state by given function.
+-}
 map : (a -> b) -> Scenario msg a -> Scenario msg b
 map f m = m `andThen` (succeed << f)
 
 
+{-| Construct scenario contains only one talk script.
+-}
 talk : TalkConfig -> Scenario msg ()
 talk conf = Talk conf <| succeed ()
 
 
+{-| Construct scenario contains only one choice event.
+-}
 choice : ChoiceConfig msg -> Scenario msg Value
 choice conf = Choice conf <| succeed
 
 
 
--- CONFIG MAKERS
+-- FUNCTIONS TO CONSTRUCT CONFIG
 
 
+{-| A type representing a talk script.
+-}
 type TalkConfig = TalkConfig
   { speaker : Speaker
   , feeling : Maybe Feeling
@@ -119,20 +129,22 @@ type TalkConfig = TalkConfig
   }
 
 
-type alias TalkParagraph =
+{-| A type representing a paragraph of talk script.
+-}
+type TalkParagraph =
   { ptag : ParagraphTag
   , text : String
   }
 
 
-{-| Owner of a talk balloon
+{-| Represents speaker of a talk script
 -}
 type Speaker
   = AI
   | User
 
 
-{-| Feeling of the owner
+{-| Feeling of the speaker of a talk script.
 -}
 type Feeling
   = FeelNormal
@@ -140,7 +152,8 @@ type Feeling
   | FeelGood
 
 
-{-| Which meanings of the paragraph?
+{-| Which role a paragraph have?
+    Its role is like a HTML tag.
 -}
 type ParagraphTag
   = PlainParagraph
@@ -152,6 +165,8 @@ type ParagraphTag
   | CustomParagraph String
 
 
+{-| Representing a choice event.
+-}
 type ChoiceConfig msg
   = SingleInput
     { inputArea : InputArea msg
@@ -164,6 +179,8 @@ type ChoiceConfig msg
   | CustomInput String (Dict String Value)
 
 
+{-| Representing a input area of a choice event.
+-}
 type alias InputArea msg =
   { attr : List (Attribute msg)
   , preContent : Html msg
@@ -172,12 +189,17 @@ type alias InputArea msg =
   }
 
 
+{-| Representing a submit button of a choice event.
+-}
 type alias SubmitButton msg =
   { attr : List (Attribute msg)
   , label : String
   }
 
 
+{-| A method to construct the `InputConfig' having only one-line input area.
+    (e.g., for one-line phone number input, email input, simple comment...)
+-}
 singleInput : InputArea msg -> SubmitButton msg -> InputConfig msg
 singleInput input submit = SingleInput
   { inputArea = input
@@ -185,6 +207,9 @@ singleInput input submit = SingleInput
   }
 
 
+{-| A method to construct the `InputConfig' having multi input area.
+    (e.g., for name input with family name box, given name box, and middle name box.)
+-}
 multiInput : List (InputArea msg) -> SubmitButton msg -> InputConfig msg
 multiInput inputs submit = MultiInput
   { inputAreas = inputs
@@ -192,10 +217,16 @@ multiInput inputs submit = MultiInput
   }
 
 
+{-| A method to construct the `InputConfig' of custom type.
+    The first argument is identifire of this custom type,
+    and the second one is dictionary of settings for this custom type used on rendering.
+-}
 customInput : String -> (Dict String Value) -> InputConfig msg
 customInput = CustomInput
 
 
+{-| A method to construct the `TalkConfig'.
+-}
 talkConfig : Speaker -> Maybe Feeling -> List TalkParagraph -> TalkConfig
 talkConfig s mf ps =
   TalkConfig
@@ -204,6 +235,14 @@ talkConfig s mf ps =
     , body = ps
     }
 
+
+{-| A method to construct the `TalkParagraph'.
+-}
+talkParagraph : ParagraphTag -> String -> TalkParagraph
+talkParagraph ptag text = TalkParagraph
+  { ptag : ptag
+  , text : text
+  }
 
 
 -- InputConfig
@@ -252,6 +291,7 @@ sampleScenario =
 
 choice : ChoiceConfig msg -> Scenario msg Value
 choice conf = Choice conf <| succeed
+
 
 type ChoiceConfig msg
   = SingleInput
