@@ -131,7 +131,7 @@ type TalkConfig = TalkConfig
 
 {-| A type representing a paragraph of talk script.
 -}
-type TalkParagraph =
+type TalkParagraph = TalkParagraph
   { ptag : ParagraphTag
   , text : String
   }
@@ -197,31 +197,31 @@ type alias SubmitButton msg =
   }
 
 
-{-| A method to construct the `InputConfig' having only one-line input area.
-    (e.g., for one-line phone number input, email input, simple comment...)
+{-| A method to construct the `ChoiceConfig` having only one-line input area.
+    (e.g., for one-line phone number input box, simple comment box, select box,...)
 -}
-singleInput : InputArea msg -> SubmitButton msg -> InputConfig msg
+singleInput : InputArea msg -> SubmitButton msg -> ChoiceConfig msg
 singleInput input submit = SingleInput
   { inputArea = input
   , submitButton = submit
   }
 
 
-{-| A method to construct the `InputConfig' having multi input area.
+{-| A method to construct the `ChoiceConfig` having multi input area.
     (e.g., for name input with family name box, given name box, and middle name box.)
 -}
-multiInput : List (InputArea msg) -> SubmitButton msg -> InputConfig msg
+multiInput : List (InputArea msg) -> SubmitButton msg -> ChoiceConfig msg
 multiInput inputs submit = MultiInput
   { inputAreas = inputs
   , submitButton = submit
   }
 
 
-{-| A method to construct the `InputConfig' of custom type.
-    The first argument is identifire of this custom type,
+{-| A method to construct the `ChoiceConfig` of custom type.
+    The first argument is the name of this custom type,
     and the second one is dictionary of settings for this custom type used on rendering.
 -}
-customInput : String -> (Dict String Value) -> InputConfig msg
+customInput : String -> Dict String Value -> ChoiceConfig msg
 customInput = CustomInput
 
 
@@ -240,14 +240,16 @@ talkConfig s mf ps =
 -}
 talkParagraph : ParagraphTag -> String -> TalkParagraph
 talkParagraph ptag text = TalkParagraph
-  { ptag : ptag
-  , text : text
+  { ptag = ptag
+  , text = text
   }
 
 
 -- InputConfig
 
 
+{-| Representing input box style.
+-}
 type InputConfig msg
   = TagInput (List (Attribute msg)) (List (Html msg))
   | TagTextArea (List (Attribute msg)) (List (Html msg))
@@ -258,14 +260,20 @@ type InputConfig msg
 -- HELPER FUNCTIONS
 
 
+{-| Html `input` tag for `InputConfig`.
+-}
 tagInput : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagInput = TagInput
 
 
+{-| Html `textarea` tag for `InputConfig`.
+-}
 tagTextArea : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagTextArea = TagTextArea
 
 
+{-| Html `select` tag for `InputConfig`.
+-}
 tagSelect : List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagSelect = TagSelect
 
@@ -275,31 +283,3 @@ tagSelect = TagSelect
 -}
 tagCustom : String -> List (Attribute msg) -> List (Html msg) -> InputConfig msg
 tagCustom = TagCustom
-
-
-sampleScenario :: Scenario msg ()
-sampleScenario =
-  talk <| talkConfig AI Nothing
-    [ { PlainParagraph
-      , "Test"
-      }
-    , { ImportantParagraph
-      , "Is this important question?"
-      }
-    ] `andAlways`
-  choice <| SingleInput
-
-choice : ChoiceConfig msg -> Scenario msg Value
-choice conf = Choice conf <| succeed
-
-
-type ChoiceConfig msg
-  = SingleInput
-    { inputArea : InputArea msg
-    , submitButton : SubmitButton msg
-    }
-  | MultiInput
-    { inputAreas : List (InputArea msg)
-    , submitButton : SubmitButton msg
-    }
-  | CustomInput String (Dict String Value)
