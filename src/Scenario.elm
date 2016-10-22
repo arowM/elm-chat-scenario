@@ -1,55 +1,25 @@
 module Scenario exposing
   ( Scenario
-  , TalkConfig
-  , TalkParagraph
-  , ChoiceConfig
-  , InputConfig
   , succeed
   , andThen
   , andAlways
   , map
-  , talk
-  , talkConfig
-  , choice
-  , singleInput
-  , multiInput
-  , customInput
-  , tagInput
-  , tagTextArea
-  , tagSelect
-  , tagCustom
+  , print
+  , read
   )
 
-{-| Type safe scenario model for chat like UI.
+{-| A type safe DSL for CLI or Conversational User Interface.
 
 # Common Types
 
 @docs Scenario
 
-# Dominant functions to construct scenario
+# Convenient functions to construct scenario
 
-@docs talk
-@docs choice
+@docs print
+@docs read
 @docs andThen
 @docs andAlways
-
-# Types and functions to construct talk script
-
-@docs TalkConfig
-@docs TalkParagraph
-@docs talkConfig
-@docs tagInput
-@docs tagTextArea
-@docs tagSelect
-@docs tagCustom
-
-# Functions to construct input area
-
-@docs ChoiceConfig
-@docs InputConfig
-@docs singleInput
-@docs multiInput
-@docs customInput
 
 # Rarely used but important functions
 
@@ -58,35 +28,35 @@ module Scenario exposing
 -}
 
 
-import Dict exposing (Dict)
-import Html exposing (Attribute, Html)
-import Json.Encode exposing (Value)
-
 
 {-| Main type of this module to represent scenario.
 -}
-type Scenario msg a
-  = Talk TalkConfig (Scenario msg a)
-  | Choice (ChoiceConfig msg) (Value -> Scenario msg a)
+type Scenario t v a
+  = Print t (Scenario t v a)
+  | Read (v -> Scenario t v a)
   | Pure a
+
+
+
+-- Monad Instances
 
 
 {-| Construct scenario with any state.
 -}
-succeed : a -> Scenario msg a
+succeed : a -> Scenario t v a
 succeed = Pure
 
 
 {-| Combine two scenarios to make one scenario.
 -}
-andThen : Scenario msg a -> (a -> Scenario msg b) -> Scenario msg b
+andThen : Scenario t v a -> (a -> Scenario t v b) -> Scenario t v b
 andThen s f =
   case s of
-    Talk c next ->
-      Talk c (next `andThen` f)
+    Print c next ->
+      Print c (next `andThen` f)
 
-    Choice c g ->
-      Choice c (\v -> g v `andThen` f)
+    Read g ->
+      Read (\v -> (g v `andThen` f))
 
     Pure a ->
       f a
@@ -94,192 +64,27 @@ andThen s f =
 
 {-| Similar to `andThen`, but ignores previous state.
 -}
-andAlways : Scenario msg a -> Scenario msg b -> Scenario msg b
+andAlways : Scenario t v a -> Scenario t v b -> Scenario t v b
 andAlways s1 s2 = s1 `andThen` always s2
 
 
 {-| Convert scenario state by given function.
 -}
-map : (a -> b) -> Scenario msg a -> Scenario msg b
+map : (a -> b) -> Scenario t v a -> Scenario t v b
 map f m = m `andThen` (succeed << f)
+
+
+
+-- Constructors for `Scenario` type
 
 
 {-| Construct scenario contains only one talk script.
 -}
-talk : TalkConfig -> Scenario msg ()
-talk conf = Talk conf <| succeed ()
+print : t -> Scenario t v ()
+print conf = Print conf <| succeed ()
 
 
 {-| Construct scenario contains only one choice event.
 -}
-choice : ChoiceConfig msg -> Scenario msg Value
-choice conf = Choice conf <| succeed
-
-
-
--- FUNCTIONS TO CONSTRUCT CONFIG
-
-
-{-| A type representing a talk script.
--}
-type TalkConfig = TalkConfig
-  { speaker : Speaker
-  , feeling : Maybe Feeling
-  , body : List TalkParagraph
-  }
-
-
-{-| A type representing a paragraph of talk script.
--}
-type TalkParagraph = TalkParagraph
-  { ptag : ParagraphTag
-  , text : String
-  }
-
-
-{-| Represents speaker of a talk script
--}
-type Speaker
-  = AI
-  | User
-
-
-{-| Feeling of the speaker of a talk script.
--}
-type Feeling
-  = FeelNormal
-  | FeelBad
-  | FeelGood
-
-
-{-| Which role a paragraph have?
-    Its role is like a HTML tag.
--}
-type ParagraphTag
-  = PlainParagraph
-  | AnnotationParagraph
-  | ImportantParagraph
-  | TitleParagraph
-  | SubParagraph
-  | ImageParagraph
-  | CustomParagraph String
-
-
-{-| Representing a choice event.
--}
-type ChoiceConfig msg
-  = SingleInput
-    { inputArea : InputArea msg
-    , submitButton : SubmitButton msg
-    }
-  | MultiInput
-    { inputAreas : List (InputArea msg)
-    , submitButton : SubmitButton msg
-    }
-  | CustomInput String (Dict String Value)
-
-
-{-| Representing a input area of a choice event.
--}
-type alias InputArea msg =
-  { attr : List (Attribute msg)
-  , preContent : Html msg
-  , input : InputConfig msg
-  , postContent : Html msg
-  }
-
-
-{-| Representing a submit button of a choice event.
--}
-type alias SubmitButton msg =
-  { attr : List (Attribute msg)
-  , label : String
-  }
-
-
-{-| A method to construct the `ChoiceConfig` having only one-line input area.
-    (e.g., for one-line phone number input box, simple comment box, select box,...)
--}
-singleInput : InputArea msg -> SubmitButton msg -> ChoiceConfig msg
-singleInput input submit = SingleInput
-  { inputArea = input
-  , submitButton = submit
-  }
-
-
-{-| A method to construct the `ChoiceConfig` having multi input area.
-    (e.g., for name input with family name box, given name box, and middle name box.)
--}
-multiInput : List (InputArea msg) -> SubmitButton msg -> ChoiceConfig msg
-multiInput inputs submit = MultiInput
-  { inputAreas = inputs
-  , submitButton = submit
-  }
-
-
-{-| A method to construct the `ChoiceConfig` of custom type.
-    The first argument is the name of this custom type,
-    and the second one is dictionary of settings for this custom type used on rendering.
--}
-customInput : String -> Dict String Value -> ChoiceConfig msg
-customInput = CustomInput
-
-
-{-| A method to construct the `TalkConfig'.
--}
-talkConfig : Speaker -> Maybe Feeling -> List TalkParagraph -> TalkConfig
-talkConfig s mf ps =
-  TalkConfig
-    { speaker = s
-    , feeling = mf
-    , body = ps
-    }
-
-
-{-| A method to construct the `TalkParagraph'.
--}
-talkParagraph : ParagraphTag -> String -> TalkParagraph
-talkParagraph ptag text = TalkParagraph
-  { ptag = ptag
-  , text = text
-  }
-
-
--- InputConfig
-
-
-{-| Representing input box style.
--}
-type InputConfig msg
-  = TagInput (List (Attribute msg)) (List (Html msg))
-  | TagTextArea (List (Attribute msg)) (List (Html msg))
-  | TagSelect (List (Attribute msg)) (List (Html msg))
-  | TagCustom String (List (Attribute msg)) (List (Html msg))
-
-
--- HELPER FUNCTIONS
-
-
-{-| Html `input` tag for `InputConfig`.
--}
-tagInput : List (Attribute msg) -> List (Html msg) -> InputConfig msg
-tagInput = TagInput
-
-
-{-| Html `textarea` tag for `InputConfig`.
--}
-tagTextArea : List (Attribute msg) -> List (Html msg) -> InputConfig msg
-tagTextArea = TagTextArea
-
-
-{-| Html `select` tag for `InputConfig`.
--}
-tagSelect : List (Attribute msg) -> List (Html msg) -> InputConfig msg
-tagSelect = TagSelect
-
-
-{-| Make input area with custom tag.
-    The first argument is the custom tag name.
--}
-tagCustom : String -> List (Attribute msg) -> List (Html msg) -> InputConfig msg
-tagCustom = TagCustom
+read : Scenario t v v
+read = Read <| succeed

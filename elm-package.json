@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "summary": "Type safe scenario model for chat like UI.",
+    "summary": "A type safe DSL for CLI or Conversational User Interface.",
     "repository": "https://github.com/arowM/chat-ui-elm.git",
     "license": "MIT",
     "source-directories": [

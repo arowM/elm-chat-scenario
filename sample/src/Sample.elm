@@ -1,7 +1,7 @@
-import Scenario exposing (Scenario)
+import Scenario exposing (..)
 
 
-sampleScenario :: Scenario msg ()
+sampleScenario : Scenario msg ()
 sampleScenario =
   talk <| talkConfig AI Nothing
     [ { PlainParagraph
@@ -10,5 +10,4 @@ sampleScenario =
     , { ImportantParagraph
       , "Is this important question?"
       }
-    ] `andAlways`
-  choice <| SingleInput
+    ]
