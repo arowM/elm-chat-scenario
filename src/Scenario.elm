@@ -79,9 +79,9 @@ andThen f s =
 
 {-| Similar to `andThen`, but ignores previous state.
 -}
-andAlways : Scenario c t v a -> Scenario c t v b -> Scenario c t v b
-andAlways s1 s2 =
-    s1 |> andThen (always s2)
+andAlways : Scenario c t v b -> Scenario c t v a -> Scenario c t v b
+andAlways s2 =
+    andThen (always s2)
 
 
 {-| Convert scenario state by given function.
