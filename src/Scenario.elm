@@ -1,12 +1,16 @@
 module Scenario
     exposing
         ( Scenario
-        , succeed
-        , andThen
-        , andAlways
-        , map
         , print
         , read
+        , andThen
+        , andAlways
+        , update
+        , Config
+        , config
+        , pushAnswer
+        , succeed
+        , map
         )
 
 {-| A type safe DSL for CLI or Conversational User Interface.
@@ -22,6 +26,16 @@ module Scenario
 @docs andThen
 @docs andAlways
 
+# Functions to run scenario model
+
+@docs update
+@docs pushAnswer
+
+# Configurations for running scenario
+
+@docs Config
+@docs config
+
 # Rarely used but important functions
 
 @docs succeed
@@ -31,9 +45,9 @@ module Scenario
 
 {-| Main type of this module to represent scenario.
 -}
-type Scenario t v a
-    = Print t (Scenario t v a)
-    | Read (v -> Scenario t v a)
+type Scenario c t v a
+    = Print t (Scenario c t v a)
+    | Read c (v -> Scenario c t v a)
     | Pure a
 
 
@@ -43,21 +57,21 @@ type Scenario t v a
 
 {-| Construct scenario with any state.
 -}
-succeed : a -> Scenario t v a
+succeed : a -> Scenario c t v a
 succeed =
     Pure
 
 
 {-| Combine two scenarios to make one scenario.
 -}
-andThen : (a -> Scenario t v b) -> Scenario t v a -> Scenario t v b
+andThen : (a -> Scenario c t v b) -> Scenario c t v a -> Scenario c t v b
 andThen f s =
     case s of
         Print c next ->
             Print c (next |> andThen f)
 
-        Read g ->
-            Read (\v -> (g v |> andThen f))
+        Read c g ->
+            Read c (\v -> (g v |> andThen f))
 
         Pure a ->
             f a
@@ -65,14 +79,14 @@ andThen f s =
 
 {-| Similar to `andThen`, but ignores previous state.
 -}
-andAlways : Scenario t v a -> Scenario t v b -> Scenario t v b
+andAlways : Scenario c t v a -> Scenario c t v b -> Scenario c t v b
 andAlways s1 s2 =
     s1 |> andThen (always s2)
 
 
 {-| Convert scenario state by given function.
 -}
-map : (a -> b) -> Scenario t v a -> Scenario t v b
+map : (a -> b) -> Scenario c t v a -> Scenario c t v b
 map f m =
     m |> andThen (succeed << f)
 
@@ -81,15 +95,69 @@ map f m =
 -- Constructors for `Scenario` type
 
 
-{-| Construct scenario contains only one talk script.
+{-| Construct scenario contains only one print message event.
 -}
-print : t -> Scenario t v ()
+print : t -> Scenario c t v ()
 print conf =
     Print conf <| succeed ()
 
 
-{-| Construct scenario contains only one choice event.
+{-| Construct scenario contains only one read input event.
 -}
-read : Scenario t v v
-read =
-    Read <| succeed
+read : c -> Scenario c t v v
+read c =
+    Read c <| succeed
+
+
+
+-- Configuration
+
+
+{-| Configuration for running scenario
+-}
+type Config msg c t v = Config
+    { handlePrint : t -> Cmd msg
+    , handleEnd : Cmd msg
+    , askRead : c -> Cmd msg
+    }
+
+
+{-| Constructor for `Config`
+-}
+config : (t -> Cmd msg) -> Cmd msg -> (c -> Cmd msg) -> Config msg c t v
+config p e r =
+    Config
+        { handlePrint = p
+        , handleEnd = e
+        , askRead = r
+        }
+
+
+
+-- Run Scenario DSL
+
+
+{-| Run scenario step by step.
+-}
+update : Config msg c t v -> Scenario c t v a -> (Scenario c t v a, Cmd msg)
+update (Config config) scenario =
+    case scenario of
+        Print t next ->
+            (next, config.handlePrint t)
+
+        Read c f ->
+            (scenario, config.askRead c)
+
+        Pure _ ->
+            (scenario, config.handleEnd)
+
+
+{-| Push answer to a scenario and get next scenario
+-}
+pushAnswer : v -> Scenario c t v a -> Scenario c t v a
+pushAnswer v scenario =
+    case scenario of
+        Read _ f ->
+            f v
+        _ ->
+            scenario
