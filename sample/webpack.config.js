@@ -44,7 +44,7 @@ const commonConfig = {
     modulesDirectories: ['node_modules'],
     extensions: ['', '.js', '.elm'],
     root: [
-      path.resolve('src/elm'),
+      path.resolve('src'),
     ]
   },
 
