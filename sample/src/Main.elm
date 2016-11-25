@@ -4,7 +4,6 @@ import Html.Events exposing (..)
 import Process as Process
 import Task as Task
 import Time as Time
-import Debug as Debug
 
 import Scenario as Scenario
 
