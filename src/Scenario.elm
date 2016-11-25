@@ -115,11 +115,12 @@ read c =
 
 {-| Configuration for running scenario
 -}
-type Config msg c t v = Config
-    { handlePrint : t -> Cmd msg
-    , handleEnd : Cmd msg
-    , askRead : c -> Cmd msg
-    }
+type Config msg c t v
+    = Config
+        { handlePrint : t -> Cmd msg
+        , handleEnd : Cmd msg
+        , askRead : c -> Cmd msg
+        }
 
 
 {-| Constructor for `Config`
@@ -139,17 +140,17 @@ config p e r =
 
 {-| Run scenario step by step.
 -}
-update : Config msg c t v -> Scenario c t v a -> (Scenario c t v a, Cmd msg)
+update : Config msg c t v -> Scenario c t v a -> ( Scenario c t v a, Cmd msg )
 update (Config config) scenario =
     case scenario of
         Print t next ->
-            (next, config.handlePrint t)
+            ( next, config.handlePrint t )
 
         Read c f ->
-            (scenario, config.askRead c)
+            ( scenario, config.askRead c )
 
         Pure _ ->
-            (scenario, config.handleEnd)
+            ( scenario, config.handleEnd )
 
 
 {-| Push answer to a scenario and get next scenario
@@ -159,5 +160,6 @@ pushAnswer v scenario =
     case scenario of
         Read _ f ->
             f v
+
         _ ->
             scenario
