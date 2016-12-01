@@ -1,9 +1,29 @@
-module HomepageCss exposing (css)
+module Scenario.Styles.ChatUI exposing
+  ( css
+  , homepageNamespace
+  , CssClasses(..)
+  )
 
 import Css exposing (..)
-import Css.Elements exposing (..)
 import Css.Namespace exposing (namespace)
-import SharedStyles exposing (..)
+import Html.CssHelpers exposing (withNamespace)
+
+
+type CssClasses
+    = Container
+    | Header
+    | MessageArea
+    | Balloon
+    | IsInput
+    | InputArea
+    | SingleInput
+    | SubmitButton
+
+
+homepageNamespace : Html.CssHelpers.Namespace String class id msg
+homepageNamespace =
+    withNamespace "homepage"
+
 
 css : Stylesheet
 css =
@@ -104,13 +124,23 @@ css =
             ]
         ]
 
+lightMainColor : Color
 lightMainColor = hex "aee7ff"
+mainColor : Color
 mainColor = hex "5ea7e1"
+textColor : Color
 textColor = hex "1b5a74"
+primaryColor : Color
 primaryColor = hex "94cf85"
+darkPrimaryColor : Color
 darkPrimaryColor = hex "7caa70"
+lightPrimaryColor : Color
 lightPrimaryColor = hex "aade9d"
+secondaryColor : Color
 secondaryColor = hex "dec575"
+darkColor : Color
 darkColor = hex "3c85bf"
+white : Color
 white = hex "fff"
+black : Color
 black = hex "000"

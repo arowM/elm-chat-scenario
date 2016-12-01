@@ -8,7 +8,7 @@ import Task as Task
 import Time as Time
 
 import Scenario as Scenario
-import SharedStyles exposing (..)
+import Scenario.Styles.ChatUI exposing (..)
 
 
 
