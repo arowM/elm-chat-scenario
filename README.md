@@ -4,8 +4,9 @@ A type safe DSL for CLI or Conversational User Interface.
 
 ## Sample application
 
-Run the command bellow and open the generated `index.html` file ([demo](https://arowm.github.io/elm-chat-scenario/demo.html)).
+Run the command bellow and open [`localhost:8080/`](http://localhost:8080/) in web browser.
+Here is also ([demo site](https://arowm.github.io/elm-chat-scenario/chat-ui/)).
 
 ```
-elm-make sample/no-css/src/Main.elm
+cd sample/chat-ui/ && npm start
 ```

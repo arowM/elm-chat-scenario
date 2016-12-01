@@ -149,13 +149,13 @@ if (TARGET_ENV === 'production') {
 
     plugins: [
       new CopyWebpackPlugin([
-        {
-          from: 'src/img/',
-          to:   'img/',
-        },
-        {
-          from: 'src/favicon.ico'
-        },
+        // {
+        //   from: 'src/img/',
+        //   to:   'img/',
+        // },
+        // {
+        //   from: 'src/favicon.ico'
+        // },
       ]),
 
       new webpack.optimize.OccurenceOrderPlugin(),
