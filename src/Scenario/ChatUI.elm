@@ -1,4 +1,4 @@
-module Scenario.Styles.ChatUI exposing
+module Scenario.ChatUI exposing
   ( Model
   , Config
   , Msg
@@ -17,7 +17,7 @@ import Task as Task
 import Time as Time
 
 import Scenario as Scenario
-import Scenario.Styles.ChatUI.Css exposing (CssClasses(..))
+import Scenario.ChatUI.Css exposing (CssClasses(..))
 
 
 type alias SimpleScenario a = Scenario.Scenario () String String a

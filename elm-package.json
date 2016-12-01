@@ -8,8 +8,8 @@
     ],
     "exposed-modules": [
         "Scenario",
-        "Scenario.Styles.ChatUI",
-        "Scenario.Styles.ChatUI.Css"
+        "Scenario.ChatUI",
+        "Scenario.ChatUI.Css"
     ],
     "dependencies": {
         "elm-lang/core": "5.0.0 <= v < 6.0.0",

@@ -2,7 +2,7 @@ port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
 import Html.CssHelpers exposing (withNamespace)
-import Scenario.Styles.ChatUI.Css as ChatUI
+import Scenario.ChatUI.Css as ChatUI
 
 
 port files : CssFileStructure -> Cmd msg

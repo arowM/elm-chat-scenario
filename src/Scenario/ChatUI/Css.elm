@@ -1,4 +1,4 @@
-module Scenario.Styles.ChatUI.Css exposing
+module Scenario.ChatUI.Css exposing
   ( css
   , CssClasses(..)
   )

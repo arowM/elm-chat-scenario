@@ -3,7 +3,7 @@ module HomepageView exposing (..)
 import Html exposing (..)
 
 import Scenario as Scenario
-import Scenario.Styles.ChatUI as ChatUI
+import Scenario.ChatUI as ChatUI
 import Stylesheets exposing (mynamespace)
 
 
