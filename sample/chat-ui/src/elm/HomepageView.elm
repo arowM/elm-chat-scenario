@@ -9,6 +9,7 @@ import Time as Time
 
 import Scenario as Scenario
 import Scenario.Styles.ChatUI exposing (..)
+import Stylesheets exposing (mynamespace)
 
 
 
@@ -128,7 +129,7 @@ update message model =
 
 
 { id, class, classList } =
-    homepageNamespace
+    mynamespace
 
 
 view : Model -> Html Msg

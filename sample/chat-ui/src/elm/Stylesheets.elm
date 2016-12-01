@@ -1,16 +1,22 @@
 port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
+import Html.CssHelpers exposing (withNamespace)
 import Scenario.Styles.ChatUI as ChatUI
 
 
 port files : CssFileStructure -> Cmd msg
 
 
+mynamespace : Html.CssHelpers.Namespace String class id msg
+mynamespace =
+    withNamespace "homepage"
+
+
 fileStructure : CssFileStructure
 fileStructure =
     Css.File.toFileStructure
-        [ ( "homepage.css", Css.File.compile [ ChatUI.css ] ) ]
+        [ ( "homepage.css", Css.File.compile [ ChatUI.css mynamespace ] ) ]
 
 
 main : CssCompilerProgram

@@ -1,12 +1,11 @@
 module Scenario.Styles.ChatUI exposing
   ( css
-  , homepageNamespace
   , CssClasses(..)
   )
 
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
-import Html.CssHelpers exposing (withNamespace)
+import Html.CssHelpers
 
 
 type CssClasses
@@ -20,14 +19,9 @@ type CssClasses
     | SubmitButton
 
 
-homepageNamespace : Html.CssHelpers.Namespace String class id msg
-homepageNamespace =
-    withNamespace "homepage"
-
-
-css : Stylesheet
-css =
-    (stylesheet << namespace homepageNamespace.name)
+css : Html.CssHelpers.Namespace String class id msg -> Stylesheet
+css mynamespace =
+    (stylesheet << namespace mynamespace.name)
         [ everything
             [ boxSizing borderBox
             , fontFamily cursive
