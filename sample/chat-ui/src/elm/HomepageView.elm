@@ -1,14 +1,9 @@
 module HomepageView exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import Process as Process
-import Task as Task
-import Time as Time
 
 import Scenario as Scenario
-import Scenario.Styles.ChatUI exposing (..)
+import Scenario.Styles.ChatUI as ChatUI
 import Stylesheets exposing (mynamespace)
 
 
@@ -31,29 +26,21 @@ main =
 
 
 type alias Model =
-  { scenario : SimpleScenario ()
-  , isReadPhase : Bool
-  , history : List BalloonMessage
-  , input : String
+  { chatUI : ChatUI.Model
   }
 
-
-type alias BalloonMessage =
-  { isInput : Bool
-  , message : String
-  }
 
 init : (Model, Cmd Msg)
 init =
-  ( { scenario = sample
-    , isReadPhase = False
-    , history = []
-    , input = ""
-    }
-  , Task.perform
-    (always Next)
-    (Task.succeed ())
-  )
+  let
+    (chatUIModel, chatUICmd) = ChatUI.init sample
+  in
+    ( { chatUI = chatUIModel
+      }
+    , Cmd.batch
+      [ Cmd.map ChatUI chatUICmd
+      ]
+    )
 
 
 
@@ -61,119 +48,37 @@ init =
 
 
 type Msg
-  = Submit String
-  | UpdateInput String
-  | AskRead ()
-  | ShowPrint String
-  | Next
-  | OnEnd
+  = ChatUI ChatUI.Msg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update message model =
   case message of
-    Submit str ->
-      update
-        Next
-        { model
-        | scenario = Scenario.pushAnswer str model.scenario
-        , isReadPhase = False
-        , input = ""
-        , history = model.history ++
-          [ { message = str
-            , isInput = True
-            }
-          ]
-        }
-
-    UpdateInput str ->
-      ( { model
-        | input = str
-        }
-      , Cmd.none
-      )
-
-    AskRead () ->
-      ( { model
-        | isReadPhase = True
-        }
-      , Cmd.none
-      )
-
-    ShowPrint str ->
-      update
-        Next
-        { model
-        | history = model.history ++
-          [ { message = str
-            , isInput = False
-            }
-          ]
-        }
-
-    Next ->
+    ChatUI msg ->
       let
-        (model_, cmd_) = Scenario.update config model.scenario
+        (model_, cmd_) = ChatUI.update msg model.chatUI
       in
-        ( { model | scenario = model_
+        ( { model
+          | chatUI = model_
           }
-        , cmd_
+        , Cmd.map ChatUI cmd_
         )
-
-    OnEnd ->
-      ( model, Cmd.none )
 
 
 
 -- VIEW
 
 
-{ id, class, classList } =
-    mynamespace
-
-
 view : Model -> Html Msg
-view model =
-  div
-    [ class [ Container ]
-    ]
-    [ div
-      [ class [ Header ]
-      ]
-      [ text "elm-chat-scenario-sample"
-      ]
-    , div
-      [ class [ MessageArea ]
-      ]
-      <| List.map
-        (\msg ->
-          div
-            [ classList
-              [ (Balloon, True)
-              , (IsInput, msg.isInput)
-              ]
-            ]
-            [ text msg.message ]
-        ) model.history
-    , div
-      [ class [ InputArea ] ]
-      [ input
-        [ type_ "text"
-        , value model.input
-        , onInput UpdateInput
-        , class [ SingleInput ]
-        ]
-        []
-      , button
-        [ type_ "button"
-        , disabled <| not model.isReadPhase
-        , onClick <| Submit model.input
-        , class [ SubmitButton ]
-        ]
-        [ text "submit"
-        ]
-      ]
-    ]
+view model = Html.map ChatUI <|
+  ChatUI.view
+    ( ChatUI.config
+      { title = "elm-chat-scenario-sample"
+      , buttonLabel = "submit"
+      , namespace = mynamespace
+      }
+    )
+    model.chatUI
 
 
 
@@ -183,28 +88,6 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions _ = Sub.none
 
-
-
--- Helper functions
-
-
-config : Scenario.Config Msg () String String
-config = Scenario.config
-  (\t -> Task.perform
-    ShowPrint
-    (Process.sleep
-      (1 * Time.second)
-      |> Task.andThen (always <| Task.succeed t)
-    )
-  )
-  (Task.perform
-    (always OnEnd)
-    (Task.succeed ())
-  )
-  (\c -> Task.perform
-    AskRead
-    (Task.succeed c)
-  )
 
 
 type alias SimpleScenario a = Scenario.Scenario () String String a
