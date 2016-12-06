@@ -8,6 +8,20 @@ module Scenario.ChatUI exposing
   , config
   )
 
+{-| A Conversational User Interface component.
+
+# Common Types
+
+@docs Model
+@docs Config
+@docs Msg
+@docs update
+@docs init
+@docs view
+@docs config
+
+-}
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (Namespace)
