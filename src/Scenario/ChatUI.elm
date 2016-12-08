@@ -131,7 +131,8 @@ update message model =
 
 -- View
 
-
+{-| Configuration for view.
+-}
 type Config id = Config
   { title : String
   , buttonLabel : String
@@ -139,6 +140,8 @@ type Config id = Config
   }
 
 
+{-| A constructor for `Config`.
+-}
 config :
   { title : String
   , buttonLabel : String
@@ -147,6 +150,8 @@ config :
 config = Config
 
 
+{-| Default view.
+-}
 view : Config id -> Model -> Html Msg
 view (Config config) model =
   let { id, class, classList } =
