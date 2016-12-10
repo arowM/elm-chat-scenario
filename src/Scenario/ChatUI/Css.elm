@@ -17,6 +17,7 @@ type CssClasses
     | InputArea
     | SingleInput
     | SubmitButton
+    | BeforeFadeIn
 
 
 css : Html.CssHelpers.Namespace String class id msg -> Stylesheet
@@ -59,6 +60,7 @@ css mynamespace =
         , (.) MessageArea
             [ flex (int 1)
             , overflowY scroll
+            , opacity (num 1)
             , children
               [ (.) Balloon
                 [ border3 (px 2.4) solid mainColor
@@ -72,10 +74,15 @@ css mynamespace =
                 , fontSize (em 1.2)
                 , margin2 (em 0.4) (em 0.4)
                 , padding2 (em 0.2) (em 0.4)
+                , property "transition-property" "opacity"
+                , property "transition-duration" "1s"
                 ]
               , (.) IsInput
                 [ backgroundColor lightPrimaryColor
                 , borderColor primaryColor
+                ]
+              , (.) BeforeFadeIn
+                [ opacity (num 0)
                 ]
               ]
             ]

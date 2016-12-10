@@ -61,6 +61,7 @@ type alias Model =
 type alias BalloonMessage =
   { isInput : Bool
   , message : String
+  , beforeFadeIn : Bool
   }
 
 
@@ -70,6 +71,7 @@ type Msg
   | AskRead ()
   | ShowPrint String
   | Next
+  | FadeIn (Cmd Msg)
   | OnEnd
 
 
@@ -86,6 +88,7 @@ update message model =
         , history = model.history ++
           [ { message = str
             , isInput = True
+            , beforeFadeIn = True
             }
           ]
         }
@@ -111,6 +114,7 @@ update message model =
         | history = model.history ++
           [ { message = str
             , isInput = False
+            , beforeFadeIn = True
             }
           ]
         }
@@ -121,8 +125,28 @@ update message model =
       in
         ( { model | scenario = model_
           }
-        , cmd_
+        , (Task.perform
+            (always (FadeIn cmd_))
+            (Process.sleep
+              (1 * Time.second)
+              |> Task.andThen (always <| Task.succeed ())
+            )
+          )
         )
+
+    FadeIn cmd_ ->
+      ( { model
+        | history =
+          List.map
+          (\x ->
+            { x
+            | beforeFadeIn = False
+            }
+          )
+          model.history
+        }
+      , cmd_
+      )
 
     OnEnd ->
       ( model, Cmd.none )
@@ -174,6 +198,7 @@ view (Config config) model =
               [ classList
                 [ (Balloon, True)
                 , (IsInput, msg.isInput)
+                , (BeforeFadeIn, msg.beforeFadeIn)
                 ]
               ]
               [ text msg.message ]
@@ -207,10 +232,7 @@ scenarioConfig : Scenario.Config Msg () String String
 scenarioConfig = Scenario.config
   (\t -> Task.perform
     ShowPrint
-    (Process.sleep
-      (1 * Time.second)
-      |> Task.andThen (always <| Task.succeed t)
-    )
+    (Task.succeed t)
   )
   (Task.perform
     (always OnEnd)
