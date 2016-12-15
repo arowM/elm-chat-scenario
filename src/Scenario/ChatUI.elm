@@ -156,6 +156,9 @@ update message model =
 -- View
 
 {-| Configuration for view.
+  * `title`: Main title of this chat
+  * `buttonLabel`: Label name of submit button
+  * `namespace`: A name space for css.
 -}
 type Config id = Config
   { title : String
