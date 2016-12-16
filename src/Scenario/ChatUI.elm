@@ -168,6 +168,9 @@ type Config id = Config
 
 
 {-| A constructor for `Config`.
+  * `title`: Main title of this chat
+  * `buttonLabel`: Label name of submit button
+  * `namespace`: A name space for css.
 -}
 config :
   { title : String
