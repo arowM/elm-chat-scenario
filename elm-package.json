@@ -8,8 +8,7 @@
     ],
     "exposed-modules": [
         "Scenario",
-        "Scenario.Simple",
-        "Scenario.Simple.Css"
+        "Scenario.Simple"
     ],
     "dependencies": {
         "elm-lang/core": "5.0.0 <= v < 6.0.0",

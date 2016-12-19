@@ -2,7 +2,7 @@ port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
 import Html.CssHelpers exposing (withNamespace)
-import Scenario.Simple.Css as Simple
+import Scenario.Simple as Simple
 
 
 port files : CssFileStructure -> Cmd msg

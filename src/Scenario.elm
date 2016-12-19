@@ -14,6 +14,7 @@ module Scenario
         )
 
 {-| A type safe DSL for CLI or Conversational User Interface.
+This only exposes core utilities, so check `Scenario.*` for practical usages.
 
 # Common Types
 

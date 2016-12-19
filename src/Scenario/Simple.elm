@@ -6,6 +6,7 @@ module Scenario.Simple exposing
   , init
   , view
   , config
+  , css
   )
 
 {-| A simple Conversational User Interface component.
@@ -23,8 +24,13 @@ module Scenario.Simple exposing
 @docs Config
 @docs config
 
+# CSS
+
+@docs css
+
 -}
 
+import Css exposing (Stylesheet)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (Namespace)
@@ -34,7 +40,9 @@ import Task as Task
 import Time as Time
 
 import Scenario as Scenario
+import Scenario.Simple.Css as Css
 import Scenario.Simple.Css exposing (CssClasses(..))
+
 
 
 {-| Just a alias for `Scenario` type this module actually uses.
@@ -253,6 +261,18 @@ view (Config config) (Model model) =
           ]
         ]
       ]
+
+
+
+-- CSS
+
+
+{-| A CSS component.
+Please reffer to the `rtfeldman/elm-css` for detail.
+Also, you can see an example in `sample/simple/`.
+-}
+css : Html.CssHelpers.Namespace String class id msg -> Stylesheet
+css = Css.css
 
 
 

@@ -10,7 +10,7 @@ Also, you can see an example in `sample/simple/`.
 # Common Types
 
 @docs css
-@docs CssClasses(..)
+@docs CssClasses
 
 -}
 import Css exposing (..)
