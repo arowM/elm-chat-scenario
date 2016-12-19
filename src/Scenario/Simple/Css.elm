@@ -3,11 +3,23 @@ module Scenario.Simple.Css exposing
   , CssClasses(..)
   )
 
+{-| A CSS components for `Scenario.Simple`.
+Please reffer to the `rtfeldman/elm-css` for detail.
+Also, you can see an example in `sample/simple/`.
+
+# Common Types
+
+@docs css
+@docs CssClasses(..)
+
+-}
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
 import Html.CssHelpers
 
 
+{-| CSS classes.
+-}
 type CssClasses
     = Container
     | Header
@@ -20,6 +32,8 @@ type CssClasses
     | BeforeFadeIn
 
 
+{-| A CSS component.
+-}
 css : Html.CssHelpers.Namespace String class id msg -> Stylesheet
 css mynamespace =
     (stylesheet << namespace mynamespace.name)

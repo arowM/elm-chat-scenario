@@ -8,16 +8,19 @@ module Scenario.Simple exposing
   , config
   )
 
-{-| A Conversational User Interface component.
+{-| A simple Conversational User Interface component.
 
 # Common Types
 
 @docs Model
-@docs Config
 @docs Msg
 @docs update
 @docs init
 @docs view
+
+# For configurations
+
+@docs Config
 @docs config
 
 -}
@@ -34,9 +37,15 @@ import Scenario as Scenario
 import Scenario.Simple.Css exposing (CssClasses(..))
 
 
+{-| Just a alias for `Scenario` type this module actually uses.
+-}
 type alias SimpleScenario a = Scenario.Scenario () String String a
 
 
+{-| Create a initial `(Model, Cmd Msg)` for this module. By providing a scenario,
+you determine which schenario should be used by default. To construct a `Scenario`,
+please reffer to the `print`, `read`, `andThen`, `andAlways` in `Scenario` module.
+-}
 init : SimpleScenario () -> (Model, Cmd Msg)
 init scenario =
   ( Model
@@ -51,6 +60,8 @@ init scenario =
   )
 
 
+{-| A `Model` for this module. Combine this with parent `Model` in the manner of the elm architecture.
+-}
 type Model = Model
   { scenario : SimpleScenario ()
   , isReadPhase : Bool
@@ -59,6 +70,8 @@ type Model = Model
   }
 
 
+{-| An alias for a baloon message.
+-}
 type alias BalloonMessage =
   { isInput : Bool
   , message : String
@@ -66,6 +79,8 @@ type alias BalloonMessage =
   }
 
 
+{-| A `Msg` for this module. Combine this with parent `Msg` in the manner of the elm architecture.
+-}
 type Msg
   = Submit String
   | UpdateInput String
@@ -76,6 +91,8 @@ type Msg
   | OnEnd
 
 
+{-| A `update` for this module. Combine this with parent `update` function in the manner of the elm architecture.
+-}
 update : Msg -> Model -> (Model, Cmd Msg)
 update message (Model model) =
   case message of
@@ -162,7 +179,7 @@ update message (Model model) =
 
 -- View
 
-{-| Configuration for view.
+{-| Configurations for the `view`.
   * `title`: Main title of this chat
   * `buttonLabel`: Label name of submit button
   * `namespace`: A name space for css.
@@ -174,7 +191,7 @@ type Config id = Config
   }
 
 
-{-| A constructor for `Config`.
+{-| A constructor for `Config` type.
   * `title`: Main title of this chat
   * `buttonLabel`: Label name of submit button
   * `namespace`: A name space for css.
@@ -187,7 +204,8 @@ config :
 config = Config
 
 
-{-| Default view.
+{-| A `view` for this module. Combine this with parent `view` function in the manner of the elm architecture.
+The first argument is supposed to be constructed by `config` function.
 -}
 view : Config id -> Model -> Html Msg
 view (Config config) (Model model) =
