@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "summary": "A type safe DSL for CLI or Conversational User Interface.",
     "repository": "https://github.com/arowM/elm-chat-scenario.git",
     "license": "MIT",
