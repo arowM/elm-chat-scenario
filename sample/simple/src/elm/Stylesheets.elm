@@ -2,7 +2,7 @@ port module Stylesheets exposing (..)
 
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
 import Html.CssHelpers exposing (withNamespace)
-import Scenario.ChatUI.Css as ChatUI
+import Scenario.Simple.Css as Simple
 
 
 port files : CssFileStructure -> Cmd msg
@@ -16,7 +16,7 @@ mynamespace =
 fileStructure : CssFileStructure
 fileStructure =
     Css.File.toFileStructure
-        [ ( "homepage.css", Css.File.compile [ ChatUI.css mynamespace ] ) ]
+        [ ( "homepage.css", Css.File.compile [ Simple.css mynamespace ] ) ]
 
 
 main : CssCompilerProgram

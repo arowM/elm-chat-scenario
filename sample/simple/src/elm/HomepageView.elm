@@ -3,7 +3,7 @@ module HomepageView exposing (..)
 import Html exposing (..)
 
 import Scenario as Scenario
-import Scenario.ChatUI as ChatUI
+import Scenario.Simple as Simple
 import Stylesheets exposing (mynamespace)
 
 
@@ -26,19 +26,19 @@ main =
 
 
 type alias Model =
-  { chatUI : ChatUI.Model
+  { chatUI : Simple.Model
   }
 
 
 init : (Model, Cmd Msg)
 init =
   let
-    (chatUIModel, chatUICmd) = ChatUI.init sample
+    (chatUIModel, chatUICmd) = Simple.init sample
   in
     ( { chatUI = chatUIModel
       }
     , Cmd.batch
-      [ Cmd.map ChatUI chatUICmd
+      [ Cmd.map Simple chatUICmd
       ]
     )
 
@@ -48,20 +48,20 @@ init =
 
 
 type Msg
-  = ChatUI ChatUI.Msg
+  = Simple Simple.Msg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update message model =
   case message of
-    ChatUI msg ->
+    Simple msg ->
       let
-        (model_, cmd_) = ChatUI.update msg model.chatUI
+        (model_, cmd_) = Simple.update msg model.chatUI
       in
         ( { model
           | chatUI = model_
           }
-        , Cmd.map ChatUI cmd_
+        , Cmd.map Simple cmd_
         )
 
 
@@ -70,9 +70,9 @@ update message model =
 
 
 view : Model -> Html Msg
-view model = Html.map ChatUI <|
-  ChatUI.view
-    ( ChatUI.config
+view model = Html.map Simple <|
+  Simple.view
+    ( Simple.config
       { title = "elm-chat-scenario-sample"
       , buttonLabel = "submit"
       , namespace = mynamespace
