@@ -39,7 +39,8 @@ type alias SimpleScenario a = Scenario.Scenario () String String a
 
 init : SimpleScenario () -> (Model, Cmd Msg)
 init scenario =
-  ( { scenario = scenario
+  ( Model
+    { scenario = scenario
     , isReadPhase = False
     , history = []
     , input = ""
@@ -50,7 +51,7 @@ init scenario =
   )
 
 
-type alias Model =
+type Model = Model
   { scenario : SimpleScenario ()
   , isReadPhase : Bool
   , history : List BalloonMessage
@@ -76,32 +77,35 @@ type Msg
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update message model =
+update message (Model model) =
   case message of
     Submit str ->
       update
         Next
-        { model
-        | scenario = Scenario.pushAnswer str model.scenario
-        , isReadPhase = False
-        , input = ""
-        , history = model.history ++
-          [ { message = str
-            , isInput = True
-            , beforeFadeIn = True
-            }
-          ]
-        }
+        <| Model
+          { model
+          | scenario = Scenario.pushAnswer str model.scenario
+          , isReadPhase = False
+          , input = ""
+          , history = model.history ++
+            [ { message = str
+              , isInput = True
+              , beforeFadeIn = True
+              }
+            ]
+          }
 
     UpdateInput str ->
-      ( { model
+      ( Model
+        { model
         | input = str
         }
       , Cmd.none
       )
 
     AskRead () ->
-      ( { model
+      ( Model
+        { model
         | isReadPhase = True
         }
       , Cmd.none
@@ -110,20 +114,22 @@ update message model =
     ShowPrint str ->
       update
         Next
-        { model
-        | history = model.history ++
-          [ { message = str
-            , isInput = False
-            , beforeFadeIn = True
-            }
-          ]
-        }
+        <| Model
+          { model
+          | history = model.history ++
+            [ { message = str
+              , isInput = False
+              , beforeFadeIn = True
+              }
+            ]
+          }
 
     Next ->
       let
         (model_, cmd_) = Scenario.update scenarioConfig model.scenario
       in
-        ( { model | scenario = model_
+        ( Model
+          { model | scenario = model_
           }
         , (Task.perform
             (always (FadeIn cmd_))
@@ -135,7 +141,8 @@ update message model =
         )
 
     FadeIn cmd_ ->
-      ( { model
+      ( Model
+        { model
         | history =
           List.map
           (\x ->
@@ -149,7 +156,7 @@ update message model =
       )
 
     OnEnd ->
-      ( model, Cmd.none )
+      ( Model model, Cmd.none )
 
 
 
@@ -183,7 +190,7 @@ config = Config
 {-| Default view.
 -}
 view : Config id -> Model -> Html Msg
-view (Config config) model =
+view (Config config) (Model model) =
   let { id, class, classList } =
     config.namespace
   in
