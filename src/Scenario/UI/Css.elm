@@ -1,4 +1,4 @@
-module Scenario.ChatUI.Css exposing
+module Scenario.UI.Css exposing
   ( css
   , CssClasses(..)
   )
@@ -13,7 +13,7 @@ type CssClasses
     | Header
     | MessageArea
     | Balloon
-    | IsInput
+    | UserBalloon
     | InputArea
     | SingleInput
     | SubmitButton
@@ -73,7 +73,7 @@ css mynamespace =
                 , margin2 (em 0.4) (em 0.4)
                 , padding2 (em 0.2) (em 0.4)
                 ]
-              , (.) IsInput
+              , (.) UserBalloon
                 [ backgroundColor lightPrimaryColor
                 , borderColor primaryColor
                 ]
