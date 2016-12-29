@@ -1,0 +1,42 @@
+{
+  "name": "sample-chat",
+  "description": "sample chat",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Kadzuya Okamoto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arowM/elm-chat-scenario.git"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --inline --hot",
+    "build": "rimraf dist && webpack",
+    "watch": "webpack --watch"
+  },
+  "devDependencies": {
+  },
+  "dependencies": {
+    "autoprefixer": "^6.6.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.26.1",
+    "elm": "^0.18.0",
+    "elm-css-webpack-loader": "^2.0.2",
+    "elm-hot-loader": "^0.5.4",
+    "elm-webpack-loader": "^4.1.1",
+    "extract-text-webpack-plugin": "^1.0.1",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.24.1",
+    "postcss-flexbugs-fixes": "~2.1.0",
+    "postcss-loader": "^1.2.1",
+    "postcss-reporter": "^3.0.0",
+    "pug": "^2.0.0-beta6",
+    "pug-loader": "^2.3.0",
+    "pug-walk": "1.0.0",
+    "rimraf": "^2.5.4",
+    "style-loader": "^0.13.1",
+    "url-loader": "^0.5.7",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2",
+    "webpack-merge": "^2.0.0"
+  }
+}
