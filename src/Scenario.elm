@@ -5,6 +5,9 @@ module Scenario
         , read
         , andThen
         , andAlways
+        , step
+        , StepConfig
+        , stepConfig
         , update
         , Config
         , config
@@ -29,18 +32,24 @@ This only exposes core utilities, so check `Scenario.*` for practical usages.
 
 # Functions to run scenario model
 
-@docs update
+@docs step
 @docs pushAnswer
 
 # Configurations for running scenario
 
-@docs Config
-@docs config
+@docs StepConfig
+@docs stepConfig
 
 # Rarely used but important functions
 
 @docs succeed
 @docs map
+
+# Deprecated
+
+@docs update
+@docs Config
+@docs config
 -}
 
 
@@ -116,6 +125,26 @@ read c =
 
 {-| Configuration for running scenario
 -}
+type StepConfig x c t v
+    = StepConfig
+        { handlePrint : t -> x
+        , handleEnd : x
+        , updateReadConfig : c -> x
+        }
+
+
+{-| Constructor for `StepConfig`
+-}
+stepConfig :
+  { handlePrint : t -> x
+  , handleEnd : x
+  , updateReadConfig : c -> x
+  } -> StepConfig x c t v
+stepConfig = StepConfig
+
+
+{-| Configuration for running scenario
+-}
 type Config msg c t v
     = Config
         { handlePrint : t -> Cmd msg
@@ -137,6 +166,21 @@ config p e r =
 
 
 -- Run Scenario DSL
+
+
+{-| Run scenario step by step.
+-}
+step : StepConfig x c t v -> Scenario c t v a -> (Scenario c t v a, x)
+step (StepConfig config) scenario =
+    case scenario of
+        Print t next ->
+            ( next, config.handlePrint t )
+
+        Read c f ->
+            ( scenario, config.updateReadConfig c )
+
+        Pure _ ->
+            ( scenario, config.handleEnd )
 
 
 {-| Run scenario step by step.
