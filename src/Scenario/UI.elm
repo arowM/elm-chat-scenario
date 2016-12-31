@@ -8,7 +8,7 @@ module Scenario.UI exposing
   , PrintValue
   , printImage
   , printString
-  , ReadConfig
+  , ReadArea
   , readSingleText
   , readPassword
   , readMultiLine
@@ -28,9 +28,9 @@ module Scenario.UI exposing
   , addSystemBalloon
   , Config
   , config
-  , State
-  , defaultState
-  , view
+  , renderBalloons
+  , renderPrintValue
+  , renderReadArea
   , css
   )
 
@@ -42,17 +42,13 @@ module Scenario.UI exposing
 
 # View
 
-@docs view
+@docs renderBalloons
+@docs renderPrintValue
+@docs renderReadArea
 
 # CSS
 
 @docs css
-
-# `State`
-
-@docs State
-
-@docs defaultState
 
 # `Config`
 
@@ -75,9 +71,9 @@ module Scenario.UI exposing
 @docs printImage
 @docs printString
 
-# `ReadConfig`
+# `ReadArea`
 
-@docs ReadConfig
+@docs ReadArea
 
 @docs readSingleText
 @docs readPassword
@@ -133,7 +129,7 @@ import Scenario.UI.Css exposing (CssClasses(..))
 
 {-| An alias of the `Scenario` type this module use.
 -}
-type alias DefaultScenario a = Scenario.Scenario ReadConfig PrintValue ReadValue a
+type alias DefaultScenario a = Scenario.Scenario ReadArea PrintValue ReadValue a
 
 
 {-| An alias of `String` for readability.
@@ -161,6 +157,10 @@ type alias Name = String
 type alias DefaultValue = ReadValue
 
 
+{-| An alias for `String` representing css namespace.
+-}
+type alias Namespace = String
+
 
 -- PrintValue
 
@@ -187,14 +187,14 @@ printString = PrintString
 
 
 
--- ReadConfig
+-- ReadArea
 
 
 {-| A type for specifying how to read user inputs.
-  This is an opaque type, so construct `ReadConfig` values
+  This is an opaque type, so construct `ReadArea` values
   with constructor functions bellow.
 -}
-type ReadConfig
+type ReadArea
   = ReadSingleLine InputType Name DefaultValue (Validation ReadValue)
   | ReadMultiLine Name DefaultValue (Validation ReadValue)
   | ReadSingleSelect SelectMethod Name DefaultValue (Validation ReadValue) SelectOptions
@@ -214,7 +214,7 @@ type SelectMethod
 
 {-| Construct a input field for one-line normal texts.
 -}
-readSingleText : Name -> DefaultValue -> Validation ReadValue -> ReadConfig
+readSingleText : Name -> DefaultValue -> Validation ReadValue -> ReadArea
 readSingleText = ReadSingleLine InputText
 
 
@@ -222,13 +222,13 @@ readSingleText = ReadSingleLine InputText
   This input field replace user's input with "*"s on the input field,
   but send the input text as it is to the parent component.
 -}
-readPassword : Name -> DefaultValue -> Validation ReadValue -> ReadConfig
+readPassword : Name -> DefaultValue -> Validation ReadValue -> ReadArea
 readPassword = ReadSingleLine InputPassword
 
 
 {-| Construct a input field for multi-line normal texts.
 -}
-readMultiLine : Name -> DefaultValue -> Validation ReadValue -> ReadConfig
+readMultiLine : Name -> DefaultValue -> Validation ReadValue -> ReadArea
 readMultiLine = ReadMultiLine
 
 
@@ -241,25 +241,25 @@ readMultiLine = ReadMultiLine
         |> addSelectOption "color-blue" "Blue"
         |> addSelectOption "color-green" "Green"
 -}
-singleSelectPullDown : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadConfig
+singleSelectPullDown : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadArea
 singleSelectPullDown = ReadSingleSelect SelectPullDown
 
 
 {-| Construct a set of buttons for selecting only one value from choices.
 -}
-singleSelectButton : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadConfig
+singleSelectButton : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadArea
 singleSelectButton = ReadSingleSelect SelectButton
 
 
 {-| Same as `singleSelectPullDown` but user can select multiple values.
 -}
-multiSelectPullDown : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadConfig
+multiSelectPullDown : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
 multiSelectPullDown = ReadMultiSelect SelectPullDown
 
 
 {-| Same as `singleSelectButton` but user can select multiple values.
 -}
-multiSelectButton : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadConfig
+multiSelectButton : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
 multiSelectButton = ReadMultiSelect SelectButton
 
 
@@ -316,7 +316,7 @@ noValidation = Validation Result.Ok
 -- Balloons
 
 
-{-| An opaque type representing ballons of messages.
+{-| An opaque type representing balloons of messages.
   Bellow is an example to construct a `Balloons` value.
 
     newBalloons =
@@ -398,89 +398,81 @@ config o = Config o
 
 
 
--- State
-
-
-{-| An opaque type representing component state.
--}
-type State = State
-  { title : String
-  , submitButton :
-    { label : Label
-    , disabled : Bool
-    }
-  , history : Balloons
-  , input : ReadValue
-  }
-
-
-{-| A default `State` value.
--}
-defaultState : State
-defaultState = State
-  { title = ""
-  , submitButton =
-    { label = "Submit"
-    , disabled = True
-    }
-  , history = Balloons []
-  , input = ""
-  }
-
-
-
 -- View
 
 
-{-| A default view.
+{-| Renderer for `Balloons`.
 -}
-view : Config msg -> State -> Html msg
-view (Config config) (State state) =
+renderBalloons : Namespace -> Balloons -> Html msg
+renderBalloons namespace (Balloons balloons) =
   let
     { id, class, classList } =
-      withNamespace config.namespace
-    (Balloons history) = state.history
+      withNamespace namespace
   in
     div
-      [ class [ Container ]
-      ]
-      [ div
-        [ class [ Header ]
-        ]
-        [ text state.title
-        ]
-      , div
-        [ class [ MessageArea ]
-        ]
-        <| List.map
-          (\balloon ->
-            div
-              [ classList
-                [ (Balloon, True)
-                , (Css.UserBalloon, isUserBalloon balloon)
-                ]
-              ]
-              <| renderPrintValue (balloonMessage balloon)
-          ) history
-      , div
+    [ class [ MessageArea ]
+    ]
+    <| List.map
+      (\balloon ->
+        div
+          [ classList
+            [ (Balloon, True)
+            , (Css.UserBalloon, isUserBalloon balloon)
+            ]
+          ]
+          <| renderPrintValue (balloonMessage balloon)
+      ) balloons
+
+
+{-| Renderer for `ReadArea`.
+TODO current value
+-}
+renderReadArea : Namespace -> ReadArea -> (Result String ReadValue -> msg) -> Html msg
+renderReadArea namespace readArea onInput_ =
+  let
+    { id, class, classList } =
+      withNamespace namespace
+  in
+    case readArea of
+      ReadSingleLine InputText name def (Validation validation) ->
+        div [ class [ InputArea ] ]
+          [ input
+            [ type_ "text"
+            , onInput (onInput_ << validation)
+            , class [ SingleInput ]
+            ]
+            []
+          ]
+
+      ReadSingleLine InputPassword name_ def (Validation validation) ->
+        div [ class [ InputArea ] ]
+          [ input
+            [ type_ "password"
+            , onInput (onInput_ << validation)
+            , class [ SingleInput ]
+            , defaultValue def
+            , name name_
+            ]
+            []
+          ]
+
+      ReadMultiLine name_ def (Validation validation) ->
+        div [ class [ InputArea ] ]
+          [ textarea
+            [ type_ "password"
+            , onInput (onInput_ << validation)
+            , class [ SingleInput ]
+            , name name_
+            ]
+            -- TODO
+            [ text def
+            ]
+          ]
+
+      _ ->
         -- TODO
-        [ class [ InputArea ] ]
-        [ input
-          [ type_ "text"
-          , onInput (config.onUpdateInput << Result.Ok)
-          , class [ SingleInput ]
-          ]
+        div [ class [ InputArea ] ]
           []
-        , button
-          [ type_ "button"
-          , disabled <| not state.submitButton.disabled
-          , onClick config.onSubmit
-          , class [ SubmitButton ]
-          ]
-          [ text state.submitButton.label
-          ]
-        ]
-      ]
 
 
 {-| Helper function to render `PrintValue`.
