@@ -4,7 +4,6 @@ module Scenario.UI exposing
   , ImageSrc
   , Label
   , Name
-  , DefaultValue
   , PrintValue
   , printImage
   , printString
@@ -103,7 +102,6 @@ module Scenario.UI exposing
 @docs ImageSrc
 @docs Label
 @docs Name
-@docs DefaultValue
 -}
 
 import Css exposing (Stylesheet)
@@ -152,11 +150,6 @@ type alias Label = String
 type alias Name = String
 
 
-{-| An alias for `ReadValue` representing a value the input area shows at first.
--}
-type alias DefaultValue = ReadValue
-
-
 {-| An alias for `String` representing css namespace.
 -}
 type alias Namespace = String
@@ -190,15 +183,15 @@ printString = PrintString
 -- ReadArea
 
 
-{-| A type for specifying how to read user inputs.
+{-| A type representing current state of user input area.
   This is an opaque type, so construct `ReadArea` values
   with constructor functions bellow.
 -}
 type ReadArea
-  = ReadSingleLine InputType Name DefaultValue (Validation ReadValue)
-  | ReadMultiLine Name DefaultValue (Validation ReadValue)
-  | ReadSingleSelect SelectMethod Name DefaultValue (Validation ReadValue) SelectOptions
-  | ReadMultiSelect SelectMethod Name (List DefaultValue) (Validation (List ReadValue)) SelectOptions
+  = ReadSingleLine InputType Name ReadValue (Validation ReadValue)
+  | ReadMultiLine Name ReadValue (Validation ReadValue)
+  | ReadSingleSelect SelectMethod Name ReadValue (Validation ReadValue) SelectOptions
+  | ReadMultiSelect SelectMethod Name (List ReadValue) (Validation (List ReadValue)) SelectOptions
 
 
 type InputType
@@ -214,7 +207,7 @@ type SelectMethod
 
 {-| Construct a input field for one-line normal texts.
 -}
-readSingleText : Name -> DefaultValue -> Validation ReadValue -> ReadArea
+readSingleText : Name -> ReadValue -> Validation ReadValue -> ReadArea
 readSingleText = ReadSingleLine InputText
 
 
@@ -222,13 +215,13 @@ readSingleText = ReadSingleLine InputText
   This input field replace user's input with "*"s on the input field,
   but send the input text as it is to the parent component.
 -}
-readPassword : Name -> DefaultValue -> Validation ReadValue -> ReadArea
+readPassword : Name -> ReadValue -> Validation ReadValue -> ReadArea
 readPassword = ReadSingleLine InputPassword
 
 
 {-| Construct a input field for multi-line normal texts.
 -}
-readMultiLine : Name -> DefaultValue -> Validation ReadValue -> ReadArea
+readMultiLine : Name -> ReadValue -> Validation ReadValue -> ReadArea
 readMultiLine = ReadMultiLine
 
 
@@ -241,25 +234,25 @@ readMultiLine = ReadMultiLine
         |> addSelectOption "color-blue" "Blue"
         |> addSelectOption "color-green" "Green"
 -}
-singleSelectPullDown : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadArea
+singleSelectPullDown : Name -> ReadValue -> Validation ReadValue -> SelectOptions -> ReadArea
 singleSelectPullDown = ReadSingleSelect SelectPullDown
 
 
 {-| Construct a set of buttons for selecting only one value from choices.
 -}
-singleSelectButton : Name -> DefaultValue -> Validation ReadValue -> SelectOptions -> ReadArea
+singleSelectButton : Name -> ReadValue -> Validation ReadValue -> SelectOptions -> ReadArea
 singleSelectButton = ReadSingleSelect SelectButton
 
 
 {-| Same as `singleSelectPullDown` but user can select multiple values.
 -}
-multiSelectPullDown : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
+multiSelectPullDown : Name -> List ReadValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
 multiSelectPullDown = ReadMultiSelect SelectPullDown
 
 
 {-| Same as `singleSelectButton` but user can select multiple values.
 -}
-multiSelectButton : Name -> List DefaultValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
+multiSelectButton : Name -> List ReadValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
 multiSelectButton = ReadMultiSelect SelectButton
 
 
