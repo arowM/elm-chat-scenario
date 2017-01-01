@@ -4,6 +4,7 @@ module Scenario.UI exposing
   , ImageSrc
   , Label
   , Name
+  , Namespace
   , PrintValue
   , printImage
   , printString
@@ -102,6 +103,7 @@ module Scenario.UI exposing
 @docs ImageSrc
 @docs Label
 @docs Name
+@docs Namespace
 -}
 
 import Css exposing (Stylesheet)
