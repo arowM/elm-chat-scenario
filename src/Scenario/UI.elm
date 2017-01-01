@@ -429,29 +429,31 @@ renderReadArea namespace readArea onInput_ =
       withNamespace namespace
   in
     case readArea of
-      ReadSingleLine InputText name def (Validation validation) ->
+      ReadSingleLine InputText name_ val (Validation validation) ->
         div [ class [ InputArea ] ]
           [ input
             [ type_ "text"
             , onInput (onInput_ << validation)
             , class [ SingleInput ]
-            ]
-            []
-          ]
-
-      ReadSingleLine InputPassword name_ def (Validation validation) ->
-        div [ class [ InputArea ] ]
-          [ input
-            [ type_ "password"
-            , onInput (onInput_ << validation)
-            , class [ SingleInput ]
-            , defaultValue def
+            , value val
             , name name_
             ]
             []
           ]
 
-      ReadMultiLine name_ def (Validation validation) ->
+      ReadSingleLine InputPassword name_ val (Validation validation) ->
+        div [ class [ InputArea ] ]
+          [ input
+            [ type_ "password"
+            , onInput (onInput_ << validation)
+            , class [ SingleInput ]
+            , value val
+            , name name_
+            ]
+            []
+          ]
+
+      ReadMultiLine name_ val (Validation validation) ->
         div [ class [ InputArea ] ]
           [ textarea
             [ type_ "password"
@@ -459,8 +461,7 @@ renderReadArea namespace readArea onInput_ =
             , class [ SingleInput ]
             , name name_
             ]
-            -- TODO
-            [ text def
+            [ text val
             ]
           ]
 
