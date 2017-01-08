@@ -1,7 +1,25 @@
 module Scenario.UI.InputArea
   exposing
+    ( Model
+    , defaultModel
+    , setSelections
+    , setInput
+    )
 
 {-| A set of functions for creating input area of CUI.
+
+# Model
+
+@docs Model
+
+## Constructors
+
+@docs defaultModel
+
+## Setters
+
+@docs setSelections
+@docs setInput
 
 # `ReadArea`
 
@@ -36,6 +54,49 @@ module Scenario.UI.InputArea
 -}
 
 import Scenario.UI
+
+
+-- Model
+
+
+{-| An opaque type representing state of conversations.
+-}
+type Model
+  = Model
+    { selections : List ReadValue
+    , input : ReadValue
+    }
+
+
+{-| A constructor for `Model`. It constructs default `Model` value.
+-}
+defaultModel : Model
+defaultModel =
+  Model
+    { selections = []
+    , input = ""
+    }
+
+
+{-| Set selected values of the input area.
+-}
+setSelections : List ReadValue -> Model -> Model
+setSelections vals (Model model) =
+  Model
+    { model
+      | selections = vals
+    }
+
+
+{-| Set input value of the input area.
+-}
+setInput : ReadValue -> Model -> Model
+setInput val (Model model) =
+  Model
+    { model
+      | input = val
+    }
+
 
 
 -- Config
