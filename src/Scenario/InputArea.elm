@@ -92,7 +92,10 @@ module Scenario.InputArea
 
 -}
 
-import Scenario
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.CssHelpers exposing (withNamespace)
+import Scenario.Types exposing (ReadValue, Namespace, Label)
 
 
 -- Model
@@ -116,7 +119,7 @@ fromTextArea =
 -}
 fromSelectArea : id -> SelectArea -> Model id
 fromSelectArea =
-  FromSelecArea
+  FromSelectArea
 
 
 {-| An opaque type representing a text input area.
@@ -231,6 +234,7 @@ setSelectMethod method (SelectArea area) =
 
 {-| Set select options.
 -}
+setSelectOptions : SelectOptions -> SelectArea -> SelectArea
 setSelectOptions opts (SelectArea area) =
   SelectArea
     { area
@@ -297,14 +301,14 @@ view : Namespace -> ViewConfig id msg -> Model id -> Html msg
 view namespace config model =
   case model of
     FromTextArea id area ->
-      renderTextArea config id area
+      renderTextArea namespace id config area
 
-    FromSelectArea config id area ->
-      renderSelectArea id area
+    FromSelectArea id area ->
+      renderSelectArea namespace id config area
 
 
-renderTextArea : id -> ViewConfig id msg -> TextArea -> Html msg
-renderTextArea id config (TextArea area) =
+renderTextArea : Namespace -> id -> ViewConfig id msg -> TextArea -> Html msg
+renderTextArea namespace id config (TextArea area) =
   let
     { id, class, classList } =
       withNamespace namespace
@@ -334,8 +338,8 @@ renderTextArea id config (TextArea area) =
       ]
 
 
-renderSelectArea : id -> ViewConfig id msg -> SelectArea -> Html msg
-renderSelectArea id config (SelectArea area) =
+renderSelectArea : Namespace -> id -> ViewConfig id msg -> SelectArea -> Html msg
+renderSelectArea namespace id config (SelectArea area) =
   let
     { id, class, classList } =
       withNamespace namespace
