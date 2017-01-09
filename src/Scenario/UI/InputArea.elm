@@ -1,9 +1,29 @@
 module Scenario.UI.InputArea
   exposing
     ( Model
-    , defaultModel
-    , setSelections
-    , setInput
+    , fromTextArea
+    , fromSelectArea
+    , TextArea
+    , defaultTextArea
+    , setTextInput
+    , setTextType
+    , TextType
+    , singleLineText
+    , singleLinePassword
+    , multiLineText
+    , SelectArea
+    , defaultSelectArea
+    , setSelectedValues
+    , setSelectMethod
+    , setSelectOptions
+    , SelectMethod
+    , selectPullDown
+    , selectButton
+    , SelectOptions
+    , emptySelectOptions
+    , addSelectOption
+    , view
+    , ViewConfig
     )
 
 {-| A set of functions for creating input area of CUI.
@@ -12,44 +32,63 @@ module Scenario.UI.InputArea
 
 @docs Model
 
-## Constructors
+@docs fromTextArea
+@docs fromSelectArea
 
-@docs defaultModel
+## `TextaArea`
 
-## Setters
+@docs TextArea
 
-@docs setSelections
-@docs setInput
+### Constructors
 
-# `ReadArea`
+@docs defaultTextArea
 
-@docs ReadArea
+### Setters
 
-@docs readSingleText
-@docs readPassword
-@docs readMultiLine
-@docs singleSelectPullDown
-@docs singleSelectButton
-@docs multiSelectPullDown
-@docs multiSelectButton
+@docs setTextInput
+@docs setTextType
 
-## `SelectOptions`
+#### `TextType`
+
+@docs TextType
+
+@docs singleLineText
+@docs singleLinePassword
+@docs multiLineText
+
+## `SelectArea`
+
+@docs SelectArea
+
+### Constructors
+
+@docs defaultSelectArea
+
+### Setters
+
+@docs setSelectedValues
+@docs setSelectMethod
+@docs setSelectOptions
+
+#### `SelectMethod`
+
+@docs SelectMethod
+@docs selectPullDown
+@docs selectButton
+
+#### `SelectOptions`
 
 @docs SelectOptions
-
 @docs emptySelectOptions
 @docs addSelectOption
 
-## `Validation`
-
-@docs Validation
-
-@docs validation
-@docs noValidation
-
 # View
 
-@docs renderReadArea
+@docs view
+
+# Exposed aliases
+
+@docs ViewConfig
 
 -}
 
@@ -59,222 +98,261 @@ import Scenario.UI
 -- Model
 
 
-{-| An opaque type representing state of conversations.
+{-| An opaque type representing state of input area.
 -}
-type Model
-  = Model
-    { selections : List ReadValue
-    , input : ReadValue
+type Model id
+  = FromTextArea id TextArea
+  | FromSelectArea id SelectArea
+
+
+{-| Construct a `Model` value from `TextArea` value.
+-}
+fromTextArea : id -> TextArea -> Model id
+fromTextArea =
+  FromTextArea
+
+
+{-| Construct a `Model` value from `SelectArea` value.
+-}
+fromSelectArea : id -> SelectArea -> Model id
+fromSelectArea =
+  FromSelecArea
+
+
+{-| An opaque type representing a text input area.
+-}
+type TextArea
+  = TextArea
+    { input : ReadValue
+    , textType : TextType
     }
 
 
-{-| A constructor for `Model`. It constructs default `Model` value.
+{-| A constructor for `TextArea` to construct an empty single line text input area.
 -}
-defaultModel : Model
-defaultModel =
-  Model
-    { selections = []
-    , input = ""
+defaultTextArea : TextArea
+defaultTextArea =
+  TextArea
+    { input = ""
+    , textType = SingleLineText
     }
 
 
-{-| Set selected values of the input area.
+{-| Set input text content.
 -}
-setSelections : List ReadValue -> Model -> Model
-setSelections vals (Model model) =
-  Model
-    { model
-      | selections = vals
+setTextInput : String -> TextArea -> TextArea
+setTextInput str (TextArea area) =
+  TextArea
+    { area
+      | input = str
     }
 
 
-{-| Set input value of the input area.
+{-| Set appearance of an text input area.
 -}
-setInput : ReadValue -> Model -> Model
-setInput val (Model model) =
-  Model
-    { model
-      | input = val
+setTextType : TextType -> TextArea -> TextArea
+setTextType t (TextArea area) =
+  TextArea
+    { area
+      | textType = t
     }
 
 
-
--- Config
-
-
-{-| A type representing current state of user input area.
-  This is an opaque type, so construct `ReadArea` values
-  with constructor functions bellow.
+{-| An opaque type representing appearance of text input area.
 -}
-type ReadArea
-  = ReadSingleLine InputType Name ReadValue (Validation ReadValue)
-  | ReadMultiLine Name ReadValue (Validation ReadValue)
-  | ReadSingleSelect SelectMethod Name ReadValue (Validation ReadValue) SelectOptions
-  | ReadMultiSelect SelectMethod Name (List ReadValue) (Validation (List ReadValue)) SelectOptions
+type TextType
+  = SingleLineText
+  | SingleLinePassword
+  | MultiLineText
 
 
-type InputType
-  = InputText
-  | InputPassword
+{-| A `TextType` value representing a single line text input.
+-}
+singleLineText : TextType
+singleLineText =
+  SingleLineText
 
 
+{-| A `TextType` value representing a single line password input.
+-}
+singleLinePassword : TextType
+singleLinePassword =
+  SingleLinePassword
+
+
+{-| A `TextType` value representing a multi line text input.
+-}
+multiLineText : TextType
+multiLineText =
+  MultiLineText
+
+
+{-| An opaque type representing a select area.
+-}
+type SelectArea
+  = SelectArea
+    { selected : List String
+    , method : SelectMethod
+    , options : SelectOptions
+    }
+
+
+{-| A constructor for `SelectArea` to construct an check buttons.
+  Note that this `defaultSelectArea` does not have any items, so use `setSelectOptions` to add acutual check buttons.
+-}
+defaultSelectArea : SelectArea
+defaultSelectArea =
+  SelectArea
+    { selected = []
+    , method = SelectButton
+    , options = emptySelectOptions
+    }
+
+
+{-| Set selected values.
+-}
+setSelectedValues : List String -> SelectArea -> SelectArea
+setSelectedValues vals (SelectArea area) =
+  SelectArea
+    { area
+      | selected = vals
+    }
+
+
+{-| Set select method.
+-}
+setSelectMethod : SelectMethod -> SelectArea -> SelectArea
+setSelectMethod method (SelectArea area) =
+  SelectArea
+    { area
+      | method = method
+    }
+
+
+{-| Set select options.
+-}
+setSelectOptions opts (SelectArea area) =
+  SelectArea
+    { area
+      | options = opts
+    }
+
+
+{-| An opaque type representing a method to select user choices.
+-}
 type SelectMethod
   = SelectPullDown
   | SelectButton
-  -- TODO: SelectSearch
 
 
-{-| Construct a input field for one-line normal texts.
+
+-- TODO: SelectSearch
+
+
+{-| A select method of pull down list.
 -}
-readSingleText : Name -> ReadValue -> Validation ReadValue -> ReadArea
-readSingleText = ReadSingleLine InputText
+selectPullDown : SelectMethod
+selectPullDown =
+  SelectPullDown
 
 
-{-| Construct a input field for password.
-  This input field replace user's input with "*"s on the input field,
-  but send the input text as it is to the parent component.
+{-| A select method of check buttons.
 -}
-readPassword : Name -> ReadValue -> Validation ReadValue -> ReadArea
-readPassword = ReadSingleLine InputPassword
+selectButton : SelectMethod
+selectButton =
+  SelectButton
 
 
-{-| Construct a input field for multi-line normal texts.
+{-| An opaque type representing user choices.
 -}
-readMultiLine : Name -> ReadValue -> Validation ReadValue -> ReadArea
-readMultiLine = ReadMultiLine
-
-
-{-| Construct a pull down list for selecting only one value from choices.
-  Bellow is an example usage.
-
-    singleSelectPullDown "color" "red" noValidation <|
-      emptySelectOptions
-        |> addSelectOption "color-red" "Red"
-        |> addSelectOption "color-blue" "Blue"
-        |> addSelectOption "color-green" "Green"
--}
-singleSelectPullDown : Name -> ReadValue -> Validation ReadValue -> SelectOptions -> ReadArea
-singleSelectPullDown = ReadSingleSelect SelectPullDown
-
-
-{-| Construct a set of buttons for selecting only one value from choices.
--}
-singleSelectButton : Name -> ReadValue -> Validation ReadValue -> SelectOptions -> ReadArea
-singleSelectButton = ReadSingleSelect SelectButton
-
-
-{-| Same as `singleSelectPullDown` but user can select multiple values.
--}
-multiSelectPullDown : Name -> List ReadValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
-multiSelectPullDown = ReadMultiSelect SelectPullDown
-
-
-{-| Same as `singleSelectButton` but user can select multiple values.
--}
-multiSelectButton : Name -> List ReadValue -> Validation (List ReadValue) -> SelectOptions -> ReadArea
-multiSelectButton = ReadMultiSelect SelectButton
-
-
-
--- SelectOptions
-
-
-{-| A opaque type representing user choices.
--}
-type SelectOptions =
-  SelectOptions (List (ReadValue, Label))
+type SelectOptions
+  = SelectOptions (List ( ReadValue, Label ))
 
 
 {-| A default value of `SelectOptions`.
 -}
 emptySelectOptions : SelectOptions
-emptySelectOptions = SelectOptions []
+emptySelectOptions =
+  SelectOptions []
 
 
 {-| Add new choice to a `SelectOptions` value.
 -}
-addSelectOption : (ReadValue, Label) -> SelectOptions -> SelectOptions
+addSelectOption : ( ReadValue, Label ) -> SelectOptions -> SelectOptions
 addSelectOption p (SelectOptions opts) =
-  SelectOptions <| opts ++ [p]
-
-
-
--- Validation
-
-
-{-| An opaque type for validating user input.
--}
-type Validation a
-  = Validation (a -> Result String a)
-
-
-{-| An constructor for `Validation`.
-  An argument is a fnction that get a user input and return
-
-  * `Result.Err` if the input is invalid
-  * `Result.Ok` with normalized input value if the input is valid.
--}
-validation : (a -> Result String a) -> Validation a
-validation = Validation
-
-
-{-| A validation that always pass user input as it is.
--}
-noValidation : Validation a
-noValidation = Validation Result.Ok
+  SelectOptions <| opts ++ [ p ]
 
 
 
 -- View
 
 
-{-| Renderer for `ReadArea`.
-TODO current value
+{-| A renderer for input area.
+
+  The first argument is a name space for
+  [elm-css](https://github.com/rtfeldman/elm-css).
+  It is supposed to be a unique value.
 -}
-renderReadArea : Namespace -> ReadArea -> (Result String ReadValue -> msg) -> Html msg
-renderReadArea namespace readArea onInput_ =
+view : Namespace -> ViewConfig id msg -> Model id -> Html msg
+view namespace config model =
+  case model of
+    FromTextArea id area ->
+      renderTextArea config id area
+
+    FromSelectArea config id area ->
+      renderSelectArea id area
+
+
+renderTextArea : id -> ViewConfig id msg -> TextArea -> Html msg
+renderTextArea id config (TextArea area) =
   let
     { id, class, classList } =
       withNamespace namespace
   in
-    case readArea of
-      ReadSingleLine InputText name_ val (Validation validation) ->
-        div [ class [ InputArea ] ]
-          [ input
+    div
+      []
+      [ case area.textType of
+        SingleLineText ->
+          input
             [ type_ "text"
-            , onInput (onInput_ << validation)
-            , class [ SingleInput ]
-            , value val
-            , name name_
+            , value area.input
             ]
             []
-          ]
 
-      ReadSingleLine InputPassword name_ val (Validation validation) ->
-        div [ class [ InputArea ] ]
-          [ input
+        SingleLinePassword ->
+          input
             [ type_ "password"
-            , onInput (onInput_ << validation)
-            , class [ SingleInput ]
-            , value val
-            , name name_
+            , value area.input
             ]
             []
-          ]
 
-      ReadMultiLine name_ val (Validation validation) ->
-        div [ class [ InputArea ] ]
-          [ textarea
-            [ type_ "password"
-            , onInput (onInput_ << validation)
-            , class [ SingleInput ]
-            , name name_
+        MultiLineText ->
+          textarea
+            [ value area.input
             ]
-            [ text val
-            ]
-          ]
+            []
+      ]
 
-      _ ->
-        -- TODO
-        div [ class [ InputArea ] ]
-          []
+
+renderSelectArea : id -> ViewConfig id msg -> SelectArea -> Html msg
+renderSelectArea id config (SelectArea area) =
+  let
+    { id, class, classList } =
+      withNamespace namespace
+  in
+    -- TODO
+    div
+      []
+      []
+
+
+
+-- Exposed aliases
+
+
+{-| An alias of configurations for `view`.
+
+  The `onInput` is a function fired when user update inputs.
+  The `onSubmit` is a function fired when user submit their inputs.
+-}
+type alias ViewConfig id msg =
