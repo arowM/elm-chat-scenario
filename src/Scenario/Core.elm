@@ -1,4 +1,4 @@
-module Scenario
+module Scenario.Core
     exposing
         ( Scenario
         , print
