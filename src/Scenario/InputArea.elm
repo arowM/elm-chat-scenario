@@ -1,4 +1,4 @@
-module Scenario.UI.InputArea
+module Scenario.InputArea
   exposing
     ( Model
     , fromTextArea
@@ -92,7 +92,7 @@ module Scenario.UI.InputArea
 
 -}
 
-import Scenario.UI
+import Scenario
 
 
 -- Model
@@ -356,3 +356,6 @@ renderSelectArea id config (SelectArea area) =
   The `onSubmit` is a function fired when user submit their inputs.
 -}
 type alias ViewConfig id msg =
+  { onInput : id -> List String -> msg
+  , onSubmit : id -> List String -> msg
+  }
