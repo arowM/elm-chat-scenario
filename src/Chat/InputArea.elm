@@ -1,4 +1,4 @@
-module Scenario.InputArea
+module Chat.InputArea
   exposing
     ( Model
     , fromTextArea
@@ -95,7 +95,7 @@ module Scenario.InputArea
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (withNamespace)
-import Scenario.Types exposing (ReadValue, Namespace, Label)
+import Chat.Types exposing (ReadValue, Namespace, Label)
 
 
 -- Model

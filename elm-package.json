@@ -7,10 +7,10 @@
         "src"
     ],
     "exposed-modules": [
-        "Scenario",
-        "Scenario.InputArea",
-        "Scenario.Simple",
-        "Scenario.UI"
+        "Chat.Balloon",
+        "Chat.InputArea",
+        "Chat.Scenario",
+        "Chat.Types"
     ],
     "dependencies": {
         "arowM/elm-check-button": "1.0.0 <= v < 2.0.0",

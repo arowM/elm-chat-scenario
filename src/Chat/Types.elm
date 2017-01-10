@@ -1,4 +1,4 @@
-module Scenario.Types
+module Chat.Types
   exposing
     ( ReadValue
     , ImageSrc

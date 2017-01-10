@@ -1,4 +1,4 @@
-module Scenario.Balloon
+module Chat.Balloon
   exposing
     ( Model
     , fromImageBalloon
@@ -50,7 +50,7 @@ module Scenario.Balloon
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (withNamespace)
-import Scenario.Types exposing (ImageSrc, Namespace)
+import Chat.Types exposing (ImageSrc, Namespace)
 
 
 -- Model
@@ -112,38 +112,32 @@ getIsUser (Balloon balloon) =
 
 
 
-{- An opaque type representing a image balloon. -}
-
-
+{-| An opaque type representing a image balloon.
+-}
 type ImageBalloon
   = ImageBalloon ImageSrc
 
 
 
-{- A constructor for `ImageBalloon`.
+{-| A constructor for `ImageBalloon`.
    Provide a source image path as an argument.
 -}
-
-
 imageBalloon : ImageSrc -> ImageBalloon
 imageBalloon =
   ImageBalloon
 
 
 
-{- An opaque type representing a text message balloon. -}
-
-
+{-| An opaque type representing a text message balloon.
+-}
 type TextBalloon
   = TextBalloon String
 
 
 
-{- A constructor for `TextBalloon`.
+{-| A constructor for `TextBalloon`.
    Provide a text message to show as an argument.
 -}
-
-
 textBalloon : String -> TextBalloon
 textBalloon =
   TextBalloon

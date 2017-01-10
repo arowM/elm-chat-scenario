@@ -1,4 +1,4 @@
-module Scenario.Core
+module Chat.Scenario
     exposing
         ( Scenario
         , print
