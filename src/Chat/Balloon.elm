@@ -50,6 +50,7 @@ module Chat.Balloon
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (withNamespace)
+import Chat.Balloon.Css exposing (CssClasses(..))
 import Chat.Types exposing (ImageSrc, Namespace)
 
 
@@ -192,10 +193,3 @@ renderImageBalloon namespace isUser (ImageBalloon imgSrc) =
         ]
         []
       ]
-
-
--- Css
-
-type CssClasses
-  = IsUserBalloon
-  | BalloonCore

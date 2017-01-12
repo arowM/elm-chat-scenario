@@ -8,6 +8,7 @@
     ],
     "exposed-modules": [
         "Chat.Balloon",
+        "Chat.Balloon.Css",
         "Chat.InputArea",
         "Chat.Scenario",
         "Chat.Types"
