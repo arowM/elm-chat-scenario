@@ -1,6 +1,13 @@
 # elm-chat-scenario
 
-A type safe DSL for CLI or Conversational User Interface.
+A set of modules for Conversational User Interface.
+`Elm-chat-scenario` mainly consist of following three modules.
+
+* `Chat.Scenario`: A type safe DSL for chat scenario.
+* `Chat.InputArea`: A set of functions for user input area.
+* `Chat.Balloon`: A set of functions for message balloons.
+
+Each module also provides default CSS in a manner of [elm-css](https://github.com/rtfeldman/elm-css).
 
 ## Sample application
 
