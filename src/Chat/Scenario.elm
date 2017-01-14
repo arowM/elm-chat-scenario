@@ -8,9 +8,6 @@ module Chat.Scenario
         , step
         , StepConfig
         , stepConfig
-        , update
-        , Config
-        , config
         , pushAnswer
         , succeed
         , map
@@ -44,11 +41,6 @@ module Chat.Scenario
 @docs succeed
 @docs map
 
-# Deprecated
-
-@docs update
-@docs Config
-@docs config
 -}
 
 
@@ -145,27 +137,6 @@ stepConfig :
 stepConfig = StepConfig
 
 
-{-| Configuration for running scenario
--}
-type Config msg c t v
-    = Config
-        { handlePrint : t -> Cmd msg
-        , handleEnd : Cmd msg
-        , askRead : c -> Cmd msg
-        }
-
-
-{-| Constructor for `Config`
--}
-config : (t -> Cmd msg) -> Cmd msg -> (c -> Cmd msg) -> Config msg c t v
-config p e r =
-    Config
-        { handlePrint = p
-        , handleEnd = e
-        , askRead = r
-        }
-
-
 
 -- Run Model DSL
 
@@ -180,21 +151,6 @@ step (StepConfig config) scenario =
 
         Read c f ->
             ( scenario, config.updateReadConfig c )
-
-        Pure _ ->
-            ( scenario, config.handleEnd )
-
-
-{-| Run scenario step by step.
--}
-update : Config msg c t v -> Model c t v a -> ( Model c t v a, Cmd msg )
-update (Config config) scenario =
-    case scenario of
-        Print t next ->
-            ( next, config.handlePrint t )
-
-        Read c f ->
-            ( scenario, config.askRead c )
 
         Pure _ ->
             ( scenario, config.handleEnd )
