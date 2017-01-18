@@ -15,11 +15,11 @@ module Chat.Scenario
 
 {-| A type safe DSL for a chat scenario.
 
-# Common Types
+# Model
 
 @docs Model
 
-# Convenient functions to construct scenario
+## Constructors
 
 @docs print
 @docs read
