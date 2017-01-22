@@ -3,6 +3,7 @@ module Chat.InputArea
     ( Model
     , fromTextArea
     , fromSelectArea
+    , setValues
     , TextArea
     , defaultTextArea
     , setTextInput
@@ -34,6 +35,7 @@ module Chat.InputArea
 
 @docs fromTextArea
 @docs fromSelectArea
+@docs setValues
 
 ## `TextaArea`
 
@@ -120,6 +122,26 @@ fromTextArea =
 fromSelectArea : id -> SelectArea -> Model id
 fromSelectArea =
   FromSelectArea
+
+
+{-| Set selected/input values of input area.
+  If given `Model` value is `TextArea`, only first value of the given list is applied.
+-}
+setValues : List String -> Model id -> Model id
+setValues vals model =
+  case model of
+    FromTextArea id textArea ->
+      textArea
+        |> setTextInput
+          ( Maybe.withDefault ""
+            <| List.head vals
+          )
+        |> fromTextArea id
+
+    FromSelectArea id selectArea ->
+      selectArea
+        |> setSelectedValues vals
+        |> fromSelectArea id
 
 
 {-| An opaque type representing a text input area.
