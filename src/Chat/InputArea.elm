@@ -97,6 +97,7 @@ module Chat.InputArea
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.CssHelpers exposing (withNamespace)
+import Html.Events exposing (..)
 import Chat.Types exposing (ReadValue, Namespace, Label)
 
 
@@ -330,18 +331,19 @@ view namespace config model =
 
 
 renderTextArea : Namespace -> id -> ViewConfig id msg -> TextArea -> Html msg
-renderTextArea namespace id config (TextArea area) =
+renderTextArea namespace ident config (TextArea area) =
   let
     { id, class, classList } =
       withNamespace namespace
   in
-    div
-      []
+    Html.form
+      [ onSubmit <| config.onSubmit ident [ area.input ] ]
       [ case area.textType of
         SingleLineText ->
           input
             [ type_ "text"
             , value area.input
+            , onInput <| config.onInput ident << \s -> [ s ]
             ]
             []
 
@@ -349,14 +351,20 @@ renderTextArea namespace id config (TextArea area) =
           input
             [ type_ "password"
             , value area.input
+            , onInput <| config.onInput ident << \s -> [ s ]
             ]
             []
 
         MultiLineText ->
           textarea
             [ value area.input
+            , onInput <| config.onInput ident << \s -> [ s ]
             ]
             []
+      , button
+        [ type_ "submit" ]
+        [ text "Submit"
+        ]
       ]
 
 
