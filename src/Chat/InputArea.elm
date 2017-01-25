@@ -23,6 +23,7 @@ module Chat.InputArea
     , SelectOptions
     , emptySelectOptions
     , addSelectOption
+    , noInput
     , view
     , ViewConfig
     )
@@ -35,6 +36,7 @@ module Chat.InputArea
 
 @docs fromTextArea
 @docs fromSelectArea
+@docs noInput
 @docs setValues
 
 ## `TextaArea`
@@ -109,6 +111,7 @@ import Chat.Types exposing (ReadValue, Namespace, Label)
 type Model id
   = FromTextArea id TextArea
   | FromSelectArea id SelectArea
+  | NoInput
 
 
 {-| Construct a `Model` value from `TextArea` value.
@@ -143,6 +146,9 @@ setValues vals model =
       selectArea
         |> setSelectedValues vals
         |> fromSelectArea id
+
+    NoInput ->
+      NoInput
 
 
 {-| An opaque type representing a text input area.
@@ -310,6 +316,12 @@ addSelectOption p (SelectOptions opts) =
   SelectOptions <| opts ++ [ p ]
 
 
+{-| A `Model` value of with input area.
+-}
+noInput : Model id
+noInput = NoInput
+
+
 
 -- View
 
@@ -328,6 +340,9 @@ view namespace config model =
 
     FromSelectArea id area ->
       renderSelectArea namespace id config area
+
+    NoInput ->
+      renderNoInput namespace
 
 
 renderTextArea : Namespace -> id -> ViewConfig id msg -> TextArea -> Html msg
@@ -378,6 +393,18 @@ renderSelectArea namespace id config (SelectArea area) =
     div
       []
       []
+
+
+renderNoInput : Namespace -> Html msg
+renderNoInput namespace =
+  let
+    { id, class, classList } =
+      withNamespace namespace
+  in
+    div
+      []
+      []
+
 
 
 
